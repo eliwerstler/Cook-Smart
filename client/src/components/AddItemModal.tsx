@@ -30,13 +30,16 @@ interface AddItemModalProps {
 }
 
 const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit, onClose }) => {
+  // Get today's date in YYYY-MM-DD format
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
+  
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     quantity: 1,
     unit: 'pieces',
     expiration_date: '',
-    purchase_date: '',
+    purchase_date: getTodayDate(), // Auto-fill with today's date
     notes: '',
     dietary_tags: [] as string[],
     allergens: [] as string[]
@@ -113,8 +116,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name.trim() || !formData.category) {
-      alert('Please fill in the required fields');
+    if (!formData.name.trim()) {
+      alert('Please enter an ingredient name');
+      return;
+    }
+    
+    if (!formData.category) {
+      alert('Please select an ingredient from the dropdown to auto-detect category');
       return;
     }
 
@@ -157,18 +165,24 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
     }
   };
 
-  const selectAutocompleteItem = (name: string) => {
-    setFormData(prev => ({ ...prev, name }));
+  const selectAutocompleteItem = (result: any) => {
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Auto-fill all fields based on the selected ingredient
+    setFormData(prev => ({
+      ...prev,
+      name: result.name,
+      category: result.category || prev.category,
+      unit: result.unit || 'pieces',
+      purchase_date: today,
+      quantity: 1
+    }));
+    
     setShowAutocomplete(false);
     setAutocompleteResults([]);
     setSelectedIndex(-1);
-
-    // Trigger smart suggestions for the selected item
-    if (!appliedSuggestions) {
-      const suggestions = getIngredientSuggestions(name);
-      setSmartSuggestions(suggestions);
-      setShowSuggestions(true);
-    }
+    setAppliedSuggestions(true); // Mark as applied to prevent smart suggestions overlay
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -188,7 +202,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
       case 'Enter':
         e.preventDefault();
         if (selectedIndex >= 0 && selectedIndex < autocompleteResults.length) {
-          selectAutocompleteItem(autocompleteResults[selectedIndex].name);
+          selectAutocompleteItem(autocompleteResults[selectedIndex]);
         }
         break;
       case 'Escape':
@@ -312,19 +326,28 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
                     <button
                       key={index}
                       type="button"
-                      onClick={() => selectAutocompleteItem(result.name)}
-                      className={`w-full text-left px-4 py-2 hover:bg-primary-50 transition-colors flex items-center justify-between ${
+                      onClick={() => selectAutocompleteItem(result)}
+                      className={`w-full text-left px-4 py-2 hover:bg-primary-50 transition-colors ${
                         index === selectedIndex ? 'bg-primary-100' : ''
                       } ${index === 0 ? 'rounded-t-lg' : ''} ${
                         index === autocompleteResults.length - 1 ? 'rounded-b-lg' : ''
                       }`}
                     >
-                      <span className="text-gray-900">{result.name}</span>
-                      {result.frequency > 1 && (
-                        <span className="text-xs text-gray-500 ml-2">
-                          {result.frequency} recipes
-                        </span>
-                      )}
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <span className="text-gray-900 font-medium">{result.name}</span>
+                          {result.category && (
+                            <span className="text-xs text-gray-500 ml-2">
+                              • {result.category}
+                            </span>
+                          )}
+                        </div>
+                        {result.frequency > 1 && (
+                          <span className="text-xs text-gray-400 ml-2">
+                            {result.frequency} recipes
+                          </span>
+                        )}
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -370,27 +393,24 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
             </div>
           )}
 
-          {/* Category */}
+          {/* Category - Auto-filled and Read-only */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category *
+              Category (Auto-detected)
             </label>
             <div className="relative">
               <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <select
-                required
+              <input
+                type="text"
                 value={formData.category}
-                onChange={(e) => handleChange('category', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none"
-              >
-                <option value="">Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+                readOnly
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 bg-gray-50 rounded-lg text-gray-700 cursor-not-allowed"
+                placeholder="Category will be auto-detected"
+              />
             </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Category is automatically determined from the ingredient name
+            </p>
           </div>
 
           {/* Quantity and Unit */}

@@ -385,7 +385,7 @@ router.post('/suggest', (req, res) => {
   });
 });
 
-// Search ingredient names (autocomplete)
+// Search ingredient names (autocomplete) with metadata
 router.get('/ingredients/search', (req, res) => {
   const { q } = req.query;
 
@@ -396,66 +396,185 @@ router.get('/ingredients/search', (req, res) => {
   const searchTerm = q.trim().toLowerCase();
 
   // Search in recipe ingredients and pantry items for autocomplete suggestions
-  const query = `
-    SELECT DISTINCT ingredient_name as name
-    FROM recipe_ingredients
-    WHERE LOWER(ingredient_name) LIKE ?
-    
-    UNION
-    
-    SELECT DISTINCT name
-    FROM pantry_items
-    WHERE LOWER(name) LIKE ?
+  const recipeQuery = `
+    SELECT DISTINCT ri.ingredient_name as name, ri.unit
+    FROM recipe_ingredients ri
+    WHERE LOWER(ri.ingredient_name) LIKE ?
+  `;
+
+  const pantryQuery = `
+    SELECT DISTINCT pi.name, pi.unit, pi.category
+    FROM pantry_items pi
+    WHERE LOWER(pi.name) LIKE ?
   `;
 
   const searchPattern = `%${searchTerm}%`;
 
-  db.all(query, [searchPattern, searchPattern], (err, rows) => {
+  db.all(recipeQuery, [searchPattern], (err, recipeRows) => {
     if (err) {
-      console.error('Error searching ingredients:', err);
+      console.error('Error searching recipe ingredients:', err);
       return res.status(500).json({ error: 'Failed to search ingredients' });
     }
 
-    // Group ingredients by their normalized form
-    const groupedMap = new Map();
-    
-    rows.forEach(row => {
-      const normalized = ingredientNormalizer.normalize(row.name);
-      
-      if (!groupedMap.has(normalized)) {
-        groupedMap.set(normalized, {
-          normalized,
-          displayName: ingredientNormalizer.getDisplayName(row.name),
-          variations: [],
-          frequency: 0
-        });
+    db.all(pantryQuery, [searchPattern], (err, pantryRows) => {
+      if (err) {
+        console.error('Error searching pantry items:', err);
+        return res.status(500).json({ error: 'Failed to search ingredients' });
       }
+
+      // Combine results
+      const allRows = [...recipeRows, ...pantryRows];
+
+      // Group ingredients by their normalized form with metadata
+      const groupedMap = new Map();
       
-      const group = groupedMap.get(normalized);
-      group.variations.push(row.name);
-      group.frequency++;
-    });
-
-    // Convert to array and sort by frequency and match relevance
-    const suggestions = Array.from(groupedMap.values())
-      .map(group => ({
-        name: group.displayName,
-        frequency: group.frequency,
-        variations: group.variations.length > 1 ? group.variations : undefined
-      }))
-      .sort((a, b) => {
-        // Prioritize exact or close matches
-        const aExact = a.name.toLowerCase().startsWith(searchTerm) ? 1 : 0;
-        const bExact = b.name.toLowerCase().startsWith(searchTerm) ? 1 : 0;
+      allRows.forEach(row => {
+        const normalized = ingredientNormalizer.normalize(row.name);
         
-        if (aExact !== bExact) return bExact - aExact;
-        return b.frequency - a.frequency;
-      })
-      .slice(0, 10);
+        if (!groupedMap.has(normalized)) {
+          groupedMap.set(normalized, {
+            normalized,
+            displayName: ingredientNormalizer.getDisplayName(row.name),
+            variations: [],
+            frequency: 0,
+            units: new Map(),
+            categories: new Map()
+          });
+        }
+        
+        const group = groupedMap.get(normalized);
+        group.variations.push(row.name);
+        group.frequency++;
+        
+        // Track units and categories with frequency
+        if (row.unit) {
+          const unitCount = group.units.get(row.unit) || 0;
+          group.units.set(row.unit, unitCount + 1);
+        }
+        
+        if (row.category) {
+          const categoryCount = group.categories.get(row.category) || 0;
+          group.categories.set(row.category, categoryCount + 1);
+        }
+      });
 
-    res.json(suggestions);
+      // Convert to array and determine best category/unit
+      const suggestions = Array.from(groupedMap.values())
+        .map(group => {
+          // Get most common unit
+          let mostCommonUnit = 'pieces';
+          let maxUnitCount = 0;
+          for (const [unit, count] of group.units.entries()) {
+            if (count > maxUnitCount) {
+              maxUnitCount = count;
+              mostCommonUnit = unit;
+            }
+          }
+
+          // Get most common category or infer from ingredient name
+          let mostCommonCategory = null;
+          let maxCategoryCount = 0;
+          for (const [category, count] of group.categories.entries()) {
+            if (count > maxCategoryCount) {
+              maxCategoryCount = count;
+              mostCommonCategory = category;
+            }
+          }
+
+          // If no category found, infer from ingredient name
+          if (!mostCommonCategory) {
+            mostCommonCategory = inferCategory(group.displayName);
+          }
+
+          return {
+            name: group.displayName,
+            frequency: group.frequency,
+            category: mostCommonCategory,
+            unit: mostCommonUnit,
+            variations: group.variations.length > 1 ? group.variations : undefined
+          };
+        })
+        .sort((a, b) => {
+          // Prioritize exact or close matches
+          const aExact = a.name.toLowerCase().startsWith(searchTerm) ? 1 : 0;
+          const bExact = b.name.toLowerCase().startsWith(searchTerm) ? 1 : 0;
+          
+          if (aExact !== bExact) return bExact - aExact;
+          return b.frequency - a.frequency;
+        })
+        .slice(0, 10);
+
+      res.json(suggestions);
+    });
   });
 });
+
+// Helper function to infer category from ingredient name
+function inferCategory(ingredientName) {
+  const name = ingredientName.toLowerCase();
+  
+  // Meat & Poultry
+  if (name.includes('chicken') || name.includes('beef') || name.includes('pork') || 
+      name.includes('turkey') || name.includes('lamb') || name.includes('duck') ||
+      name.includes('bacon') || name.includes('sausage') || name.includes('ham')) {
+    return 'Meat & Poultry';
+  }
+  
+  // Seafood
+  if (name.includes('fish') || name.includes('salmon') || name.includes('tuna') || 
+      name.includes('shrimp') || name.includes('prawn') || name.includes('crab') ||
+      name.includes('lobster') || name.includes('cod') || name.includes('sardine')) {
+    return 'Seafood';
+  }
+  
+  // Dairy & Eggs
+  if (name.includes('milk') || name.includes('cheese') || name.includes('cream') || 
+      name.includes('butter') || name.includes('yogurt') || name.includes('egg')) {
+    return 'Dairy & Eggs';
+  }
+  
+  // Fruits
+  if (name.includes('apple') || name.includes('banana') || name.includes('orange') || 
+      name.includes('berry') || name.includes('grape') || name.includes('lemon') ||
+      name.includes('lime') || name.includes('peach') || name.includes('pear') ||
+      name.includes('plum') || name.includes('cherry') || name.includes('mango')) {
+    return 'Fruits';
+  }
+  
+  // Vegetables
+  if (name.includes('tomato') || name.includes('onion') || name.includes('pepper') || 
+      name.includes('lettuce') || name.includes('carrot') || name.includes('potato') ||
+      name.includes('broccoli') || name.includes('spinach') || name.includes('celery') ||
+      name.includes('cucumber') || name.includes('zucchini') || name.includes('garlic') ||
+      name.includes('mushroom') || name.includes('cabbage') || name.includes('bean')) {
+    return 'Vegetables';
+  }
+  
+  // Grains & Pasta
+  if (name.includes('rice') || name.includes('pasta') || name.includes('bread') || 
+      name.includes('flour') || name.includes('oat') || name.includes('wheat') ||
+      name.includes('noodle') || name.includes('cereal') || name.includes('quinoa')) {
+    return 'Grains & Pasta';
+  }
+  
+  // Condiments & Sauces
+  if (name.includes('sauce') || name.includes('oil') || name.includes('vinegar') || 
+      name.includes('mustard') || name.includes('ketchup') || name.includes('mayo') ||
+      name.includes('soy') || name.includes('dressing')) {
+    return 'Condiments & Sauces';
+  }
+  
+  // Spices & Herbs
+  if (name.includes('salt') || name.includes('pepper') || name.includes('spice') || 
+      name.includes('herb') || name.includes('basil') || name.includes('oregano') ||
+      name.includes('thyme') || name.includes('rosemary') || name.includes('cumin') ||
+      name.includes('paprika') || name.includes('cinnamon') || name.includes('ginger')) {
+    return 'Spices & Herbs';
+  }
+  
+  // Default
+  return 'Other';
+}
 
 // Get pantry statistics
 router.get('/stats', (req, res) => {

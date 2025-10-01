@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Calendar, Package, Tag, FileText, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Calendar, Package, Tag, FileText, Sparkles, ChevronDown } from 'lucide-react';
 import { getIngredientSuggestions, getDefaultQuantity } from '../services/ingredientRecognition';
 import { pantryApi } from '../services/api';
 
@@ -46,6 +46,15 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [appliedSuggestions, setAppliedSuggestions] = useState(false);
 
+  // Autocomplete state
+  const [autocompleteResults, setAutocompleteResults] = useState<any[]>([]);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isSearching, setIsSearching] = useState(false);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (item) {
       setFormData({
@@ -61,6 +70,45 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
       });
     }
   }, [item]);
+
+  // Debounced autocomplete search
+  const searchIngredients = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setAutocompleteResults([]);
+      setShowAutocomplete(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await pantryApi.searchIngredients(query);
+      setAutocompleteResults(response.data);
+      setShowAutocomplete(response.data.length > 0);
+      setSelectedIndex(-1);
+    } catch (error) {
+      console.error('Error searching ingredients:', error);
+      setAutocompleteResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowAutocomplete(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,11 +136,66 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
       [field]: value
     }));
 
-    // Trigger smart suggestions when name changes
-    if (field === 'name' && value && value.trim().length > 2 && !appliedSuggestions) {
-      const suggestions = getIngredientSuggestions(value);
+    // Trigger autocomplete search when name changes
+    if (field === 'name') {
+      // Clear previous debounce timer
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      // Debounce the search
+      debounceTimerRef.current = setTimeout(() => {
+        searchIngredients(value);
+      }, 300);
+
+      // Trigger smart suggestions when name changes
+      if (value && value.trim().length > 2 && !appliedSuggestions) {
+        const suggestions = getIngredientSuggestions(value);
+        setSmartSuggestions(suggestions);
+        setShowSuggestions(true);
+      }
+    }
+  };
+
+  const selectAutocompleteItem = (name: string) => {
+    setFormData(prev => ({ ...prev, name }));
+    setShowAutocomplete(false);
+    setAutocompleteResults([]);
+    setSelectedIndex(-1);
+
+    // Trigger smart suggestions for the selected item
+    if (!appliedSuggestions) {
+      const suggestions = getIngredientSuggestions(name);
       setSmartSuggestions(suggestions);
       setShowSuggestions(true);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showAutocomplete || autocompleteResults.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => 
+          prev < autocompleteResults.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < autocompleteResults.length) {
+          selectAutocompleteItem(autocompleteResults[selectedIndex].name);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowAutocomplete(false);
+        setSelectedIndex(-1);
+        break;
     }
   };
 
@@ -158,15 +261,59 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
               Item Name *
             </label>
             <div className="relative">
-              <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" size={20} />
               <input
+                ref={inputRef}
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  if (formData.name.trim().length >= 2 && autocompleteResults.length > 0) {
+                    setShowAutocomplete(true);
+                  }
+                }}
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="e.g., Organic Tomatoes"
+                autoComplete="off"
               />
+              {isSearching && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+                </div>
+              )}
+              {!isSearching && autocompleteResults.length > 0 && formData.name.trim().length >= 2 && (
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              )}
+
+              {/* Autocomplete Dropdown */}
+              {showAutocomplete && autocompleteResults.length > 0 && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                >
+                  {autocompleteResults.map((result, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => selectAutocompleteItem(result.name)}
+                      className={`w-full text-left px-4 py-2 hover:bg-primary-50 transition-colors flex items-center justify-between ${
+                        index === selectedIndex ? 'bg-primary-100' : ''
+                      } ${index === 0 ? 'rounded-t-lg' : ''} ${
+                        index === autocompleteResults.length - 1 ? 'rounded-b-lg' : ''
+                      }`}
+                    >
+                      <span className="text-gray-900">{result.name}</span>
+                      {result.frequency > 1 && (
+                        <span className="text-xs text-gray-500 ml-2">
+                          {result.frequency} recipes
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

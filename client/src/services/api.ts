@@ -22,6 +22,7 @@ export const pantryApi = {
   generateShoppingList: (threshold?: number, categories?: string[]) =>
     api.post('/pantry/shopping-list', { threshold, categories }),
   getSmartSuggestions: (ingredient: string) => api.post('/pantry/suggest', { ingredient }),
+  searchIngredients: (query: string) => api.get('/pantry/ingredients/search', { params: { q: query } }),
   getCategories: () => api.get('/pantry/categories'),
   addCategory: (category: any) => api.post('/pantry/categories', category),
   getStats: () => api.get('/pantry/stats'),

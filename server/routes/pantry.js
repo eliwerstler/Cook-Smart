@@ -384,6 +384,58 @@ router.post('/suggest', (req, res) => {
   });
 });
 
+// Search ingredient names (autocomplete)
+router.get('/ingredients/search', (req, res) => {
+  const { q } = req.query;
+
+  if (!q || q.trim().length === 0) {
+    return res.json([]);
+  }
+
+  const searchTerm = q.trim().toLowerCase();
+
+  // Search in recipe ingredients and pantry items for autocomplete suggestions
+  const query = `
+    SELECT DISTINCT 
+      LOWER(TRIM(ingredient_name)) as name,
+      COUNT(*) as frequency
+    FROM recipe_ingredients
+    WHERE LOWER(ingredient_name) LIKE ?
+    GROUP BY LOWER(TRIM(ingredient_name))
+    
+    UNION
+    
+    SELECT DISTINCT
+      LOWER(TRIM(name)) as name,
+      COUNT(*) as frequency
+    FROM pantry_items
+    WHERE LOWER(name) LIKE ?
+    GROUP BY LOWER(TRIM(name))
+    
+    ORDER BY frequency DESC, name ASC
+    LIMIT 10
+  `;
+
+  const searchPattern = `%${searchTerm}%`;
+
+  db.all(query, [searchPattern, searchPattern], (err, rows) => {
+    if (err) {
+      console.error('Error searching ingredients:', err);
+      return res.status(500).json({ error: 'Failed to search ingredients' });
+    }
+
+    // Format results with proper capitalization
+    const suggestions = rows.map(row => ({
+      name: row.name.split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' '),
+      frequency: row.frequency
+    }));
+
+    res.json(suggestions);
+  });
+});
+
 // Get pantry statistics
 router.get('/stats', (req, res) => {
   const queries = {

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getDatabase } = require('../database/init');
+const ingredientNormalizer = require('../services/ingredientNormalizer');
 
 const db = getDatabase();
 
@@ -100,7 +101,7 @@ router.get('/recipes', (req, res) => {
 function calculateRecipeScore(recipe, pantryItems, strict = false) {
   const pantryMap = new Map();
   pantryItems.forEach(item => {
-    const normalizedName = normalizeIngredientName(item.name);
+    const normalizedName = ingredientNormalizer.normalize(item.name);
     pantryMap.set(normalizedName, {
       quantity: item.quantity,
       unit: item.unit,
@@ -114,8 +115,20 @@ function calculateRecipeScore(recipe, pantryItems, strict = false) {
   let matchScore = 0;
   
   recipe.ingredients.forEach(ingredient => {
-    const normalizedName = normalizeIngredientName(ingredient.name);
-    const pantryItem = pantryMap.get(normalizedName);
+    const normalizedName = ingredientNormalizer.normalize(ingredient.name);
+    
+    // First try exact match
+    let pantryItem = pantryMap.get(normalizedName);
+    
+    // If no exact match, try fuzzy matching
+    if (!pantryItem) {
+      for (const [pantryNormalized, item] of pantryMap.entries()) {
+        if (ingredientNormalizer.match(ingredient.name, item.originalName)) {
+          pantryItem = item;
+          break;
+        }
+      }
+    }
     
     if (pantryItem) {
       // Check if we have enough quantity
@@ -160,13 +173,9 @@ function calculateRecipeScore(recipe, pantryItems, strict = false) {
   };
 }
 
-// Normalize ingredient names for better matching
-function normalizeIngredientName(name) {
-  return name.toLowerCase()
-    .replace(/[^\w\s]/g, '') // Remove special characters
-    .replace(/\s+/g, ' ')    // Normalize spaces
-    .trim();
-}
+// Note: Ingredient normalization is now handled by ingredientNormalizer service
+// which provides advanced matching for variations like:
+// "tomato", "tomatos", "tomatoes", "chopped tomatoes", "cherry tomatoes"
 
 // Check if pantry quantity is sufficient for recipe requirement
 function checkQuantityMatch(pantryItem, recipeIngredient, strict = false) {
@@ -237,17 +246,34 @@ router.get('/suggestions/:recipeId', (req, res) => {
       
       const pantryMap = new Map();
       pantryItems.forEach(item => {
-        pantryMap.set(normalizeIngredientName(item.name), item);
+        pantryMap.set(ingredientNormalizer.normalize(item.name), {
+          ...item,
+          originalName: item.name
+        });
       });
       
-      const suggestions = recipeIngredients
-        .filter(ingredient => !pantryMap.has(normalizeIngredientName(ingredient.ingredient_name)))
-        .map(ingredient => ({
-          name: ingredient.ingredient_name,
-          quantity: ingredient.quantity,
-          unit: ingredient.unit,
-          optional: ingredient.optional
-        }));
+      const suggestions = recipeIngredients.filter(ingredient => {
+        const normalizedRecipeIng = ingredientNormalizer.normalize(ingredient.ingredient_name);
+        
+        // Check exact match first
+        if (pantryMap.has(normalizedRecipeIng)) {
+          return false;
+        }
+        
+        // Check fuzzy match
+        for (const [_, item] of pantryMap.entries()) {
+          if (ingredientNormalizer.match(ingredient.ingredient_name, item.originalName)) {
+            return false;
+          }
+        }
+        
+        return true;
+      }).map(ingredient => ({
+        name: ingredient.ingredient_name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        optional: ingredient.optional
+      }));
       
       res.json({
         recipeId: parseInt(recipeId),
@@ -328,7 +354,7 @@ router.get('/alternatives/:recipeId', (req, res) => {
           .map(recipe => {
             const sharedIngredients = recipe.ingredients.filter(ingredient =>
               originalIngredients.some(orig => 
-                normalizeIngredientName(orig.ingredient_name) === normalizeIngredientName(ingredient.name)
+                ingredientNormalizer.match(orig.ingredient_name, ingredient.name)
               )
             );
             

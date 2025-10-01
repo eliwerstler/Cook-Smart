@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getDatabase } = require('../database/init');
+const ingredientNormalizer = require('../services/ingredientNormalizer');
 
 const db = getDatabase();
 
@@ -396,24 +397,15 @@ router.get('/ingredients/search', (req, res) => {
 
   // Search in recipe ingredients and pantry items for autocomplete suggestions
   const query = `
-    SELECT DISTINCT 
-      LOWER(TRIM(ingredient_name)) as name,
-      COUNT(*) as frequency
+    SELECT DISTINCT ingredient_name as name
     FROM recipe_ingredients
     WHERE LOWER(ingredient_name) LIKE ?
-    GROUP BY LOWER(TRIM(ingredient_name))
     
     UNION
     
-    SELECT DISTINCT
-      LOWER(TRIM(name)) as name,
-      COUNT(*) as frequency
+    SELECT DISTINCT name
     FROM pantry_items
     WHERE LOWER(name) LIKE ?
-    GROUP BY LOWER(TRIM(name))
-    
-    ORDER BY frequency DESC, name ASC
-    LIMIT 10
   `;
 
   const searchPattern = `%${searchTerm}%`;
@@ -424,13 +416,42 @@ router.get('/ingredients/search', (req, res) => {
       return res.status(500).json({ error: 'Failed to search ingredients' });
     }
 
-    // Format results with proper capitalization
-    const suggestions = rows.map(row => ({
-      name: row.name.split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' '),
-      frequency: row.frequency
-    }));
+    // Group ingredients by their normalized form
+    const groupedMap = new Map();
+    
+    rows.forEach(row => {
+      const normalized = ingredientNormalizer.normalize(row.name);
+      
+      if (!groupedMap.has(normalized)) {
+        groupedMap.set(normalized, {
+          normalized,
+          displayName: ingredientNormalizer.getDisplayName(row.name),
+          variations: [],
+          frequency: 0
+        });
+      }
+      
+      const group = groupedMap.get(normalized);
+      group.variations.push(row.name);
+      group.frequency++;
+    });
+
+    // Convert to array and sort by frequency and match relevance
+    const suggestions = Array.from(groupedMap.values())
+      .map(group => ({
+        name: group.displayName,
+        frequency: group.frequency,
+        variations: group.variations.length > 1 ? group.variations : undefined
+      }))
+      .sort((a, b) => {
+        // Prioritize exact or close matches
+        const aExact = a.name.toLowerCase().startsWith(searchTerm) ? 1 : 0;
+        const bExact = b.name.toLowerCase().startsWith(searchTerm) ? 1 : 0;
+        
+        if (aExact !== bExact) return bExact - aExact;
+        return b.frequency - a.frequency;
+      })
+      .slice(0, 10);
 
     res.json(suggestions);
   });

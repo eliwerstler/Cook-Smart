@@ -4,27 +4,27 @@ Cook Smart is a full-stack web application that helps users manage their pantry 
 
 ## Features
 
-### 🏠 Pantry Management
+### Pantry Management
 - **Inventory Tracking**: Add, edit, and delete pantry items with detailed information
 - **Categorization**: Organize items by categories (Fruits, Vegetables, Meat, Dairy, etc.)
 - **Expiration Tracking**: Monitor expiration dates and get alerts for items expiring soon
 - **Quantity Management**: Track quantities and units for each ingredient
 - **Search & Filter**: Find items quickly with search and category filters
 
-### 📚 Recipe Database
+### Recipe Database
 - **Comprehensive Collection**: Large database of recipes with detailed ingredients
 - **Recipe Details**: Complete instructions, prep/cook times, difficulty levels, and ratings
 - **Smart Search**: Search recipes by title, description, tags, or difficulty
 - **Recipe Rating**: Rate and review your favorite recipes
 
-### 🧠 Intelligent Recommendations
+### Intelligent Recommendations
 - **Smart Matching**: Algorithm matches recipes based on available pantry ingredients
 - **Flexible Matching**: Choose between strict or flexible ingredient matching modes
 - **Match Scoring**: See how well each recipe matches your pantry (percentage and score)
 - **Missing Ingredients**: View what ingredients you need to buy for each recipe
 - **Alternative Recipes**: Discover similar recipes when you're missing key ingredients
 
-### 🎨 Modern UI/UX
+### Modern UI/UX
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
 - **Clean Interface**: Modern, intuitive design with Tailwind CSS
 - **Real-time Updates**: Instant feedback and smooth interactions
@@ -242,4 +242,4 @@ If you encounter any issues or have questions, please:
 
 ---
 
-**Happy Cooking with Cook Smart!** 🍳👨‍🍳
+**Happy Cooking with Cook Smart!**

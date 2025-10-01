@@ -255,6 +255,15 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4" autoComplete="off">
+          {/* Hidden dummy input to trick browser autocomplete */}
+          <input
+            type="text"
+            name="dummy-field"
+            autoComplete="off"
+            style={{ display: 'none' }}
+            tabIndex={-1}
+          />
+          
           {/* Item Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -266,7 +275,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
                 ref={inputRef}
                 type="text"
                 required
-                name="pantry-item-name"
+                name="pantry-item-name-unique"
+                id="pantry-item-name-field"
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -277,10 +287,11 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
                 }}
                 className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="e.g., Organic Tomatoes"
-                autoComplete="off"
+                autoComplete="chrome-off"
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck="false"
+                data-form-type="other"
               />
               {isSearching && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">

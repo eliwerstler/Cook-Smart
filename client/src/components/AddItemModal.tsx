@@ -254,7 +254,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4" autoComplete="off">
           {/* Item Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -266,6 +266,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
                 ref={inputRef}
                 type="text"
                 required
+                name="pantry-item-name"
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -277,6 +278,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
                 className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="e.g., Organic Tomatoes"
                 autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
               />
               {isSearching && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">

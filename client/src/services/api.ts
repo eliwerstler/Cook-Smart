@@ -33,6 +33,7 @@ export const recipesApi = {
   getRecipes: (params?: any) => api.get('/recipes', { params }),
   getRecipe: (id: number) => api.get(`/recipes/${id}`),
   addRecipe: (recipe: any) => api.post('/recipes', recipe),
+  createRecipe: (recipe: any) => api.post('/recipes', recipe),
   updateRecipe: (id: number, recipe: any) => api.put(`/recipes/${id}`, recipe),
   deleteRecipe: (id: number) => api.delete(`/recipes/${id}`),
   rateRecipe: (id: number, rating: number) => api.post(`/recipes/${id}/rate`, { rating }),

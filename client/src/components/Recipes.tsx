@@ -24,6 +24,7 @@ const Recipes: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [difficulty, setDifficulty] = useState<string>('all');
+  const [mealType, setMealType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'title' | 'rating' | 'cook_time'>('rating');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecipes, setTotalRecipes] = useState(0);
@@ -31,7 +32,7 @@ const Recipes: React.FC = () => {
 
   useEffect(() => {
     loadRecipes();
-  }, [currentPage, searchTerm, difficulty, sortBy]);
+  }, [currentPage, searchTerm, difficulty, mealType, sortBy]);
 
   const loadRecipes = async () => {
     try {
@@ -39,6 +40,7 @@ const Recipes: React.FC = () => {
       const params = {
         search: searchTerm || undefined,
         difficulty: difficulty !== 'all' ? difficulty : undefined,
+        meal_type: mealType !== 'all' ? mealType : undefined,
         limit: recipesPerPage,
         offset: (currentPage - 1) * recipesPerPage
       };
@@ -96,7 +98,7 @@ const Recipes: React.FC = () => {
 
       {/* Search and Filters */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -121,6 +123,22 @@ const Recipes: React.FC = () => {
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
+            </select>
+          </div>
+
+          {/* Meal Type Filter */}
+          <div className="relative">
+            <select
+              value={mealType}
+              onChange={(e) => setMealType(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none"
+            >
+              <option value="all">All Meal Types</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner">Dinner</option>
+              <option value="snack">Snack</option>
+              <option value="dessert">Dessert</option>
             </select>
           </div>
 
@@ -158,7 +176,7 @@ const Recipes: React.FC = () => {
           <ChefHat className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No recipes found</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || difficulty !== 'all'
+            {searchTerm || difficulty !== 'all' || mealType !== 'all'
               ? 'Try adjusting your search or filters'
               : 'No recipes available yet'
             }

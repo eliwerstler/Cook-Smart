@@ -3,28 +3,34 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import Pantry from './components/Pantry';
-import Recipes from './components/Recipes';
-import Recommendations from './components/Recommendations';
 import RecipeDetail from './components/RecipeDetail';
-import DataImport from './components/DataImport';
+import AddRecipe from './components/AddRecipe';
+import ParticleBackground from './components/ParticleBackground';
+import './App.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('cook');
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-greige-100 relative">
+        <ParticleBackground />
         <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-        
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-6 py-8 relative z-10">
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            {/* Redirect old routes to new simplified structure */}
+            <Route path="/" element={<Navigate to="/cook" replace />} />
+            <Route path="/dashboard" element={<Navigate to="/cook" replace />} />
+            <Route path="/recipes" element={<Navigate to="/cook" replace />} />
+            <Route path="/recommendations" element={<Navigate to="/cook" replace />} />
+            
+            {/* New simplified routes */}
+            <Route path="/cook" element={<Dashboard />} />
             <Route path="/pantry" element={<Pantry />} />
-            <Route path="/recipes" element={<Recipes />} />
-            <Route path="/recommendations" element={<Recommendations />} />
+            
+            {/* Keep recipe detail route */}
             <Route path="/recipe/:id" element={<RecipeDetail />} />
-            <Route path="/import" element={<DataImport />} />
+            <Route path="/recipe/new" element={<AddRecipe />} />
           </Routes>
         </main>
       </div>

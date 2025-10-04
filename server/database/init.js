@@ -141,7 +141,7 @@ const insertSampleRecipes = () => {
       cook_time: 15,
       servings: 4,
       difficulty: 'medium',
-      tags: 'italian,pasta,quick',
+      tags: 'italian,pasta,quick,dinner',
       ingredients: [
         { name: 'spaghetti', quantity: 400, unit: 'g' },
         { name: 'eggs', quantity: 3, unit: 'pieces' },
@@ -158,7 +158,7 @@ const insertSampleRecipes = () => {
       cook_time: 10,
       servings: 4,
       difficulty: 'easy',
-      tags: 'asian,chicken,healthy',
+      tags: 'asian,chicken,healthy,dinner',
       ingredients: [
         { name: 'chicken breast', quantity: 500, unit: 'g' },
         { name: 'bell peppers', quantity: 2, unit: 'pieces' },
@@ -176,7 +176,7 @@ const insertSampleRecipes = () => {
       cook_time: 45,
       servings: 6,
       difficulty: 'easy',
-      tags: 'vegetarian,healthy,comfort food',
+      tags: 'vegetarian,healthy,comfort food,dinner',
       ingredients: [
         { name: 'black beans', quantity: 400, unit: 'g' },
         { name: 'kidney beans', quantity: 400, unit: 'g' },
@@ -185,6 +185,80 @@ const insertSampleRecipes = () => {
         { name: 'bell peppers', quantity: 2, unit: 'pieces' },
         { name: 'chili powder', quantity: 2, unit: 'tbsp' },
         { name: 'cumin', quantity: 1, unit: 'tsp' }
+      ]
+    },
+    {
+      title: 'Pancakes with Berries',
+      description: 'Fluffy pancakes topped with fresh berries and maple syrup',
+      instructions: '1. Mix dry ingredients in a bowl\n2. Whisk wet ingredients in another bowl\n3. Combine wet and dry ingredients\n4. Cook pancakes on griddle\n5. Serve with berries and syrup',
+      prep_time: 10,
+      cook_time: 15,
+      servings: 4,
+      difficulty: 'easy',
+      tags: 'breakfast,sweet,quick',
+      ingredients: [
+        { name: 'flour', quantity: 200, unit: 'g' },
+        { name: 'eggs', quantity: 2, unit: 'pieces' },
+        { name: 'milk', quantity: 300, unit: 'ml' },
+        { name: 'baking powder', quantity: 2, unit: 'tsp' },
+        { name: 'sugar', quantity: 2, unit: 'tbsp' },
+        { name: 'mixed berries', quantity: 150, unit: 'g' },
+        { name: 'maple syrup', quantity: 4, unit: 'tbsp' }
+      ]
+    },
+    {
+      title: 'Caesar Salad',
+      description: 'Classic Caesar salad with romaine lettuce, croutons, and parmesan',
+      instructions: '1. Wash and chop romaine lettuce\n2. Make Caesar dressing\n3. Add croutons and parmesan\n4. Toss with dressing\n5. Serve immediately',
+      prep_time: 15,
+      cook_time: 0,
+      servings: 2,
+      difficulty: 'easy',
+      tags: 'salad,lunch,healthy,vegetarian',
+      ingredients: [
+        { name: 'romaine lettuce', quantity: 1, unit: 'head' },
+        { name: 'parmesan cheese', quantity: 50, unit: 'g' },
+        { name: 'croutons', quantity: 1, unit: 'cup' },
+        { name: 'mayonnaise', quantity: 3, unit: 'tbsp' },
+        { name: 'garlic', quantity: 2, unit: 'cloves' },
+        { name: 'lemon juice', quantity: 2, unit: 'tbsp' },
+        { name: 'anchovies', quantity: 4, unit: 'pieces' }
+      ]
+    },
+    {
+      title: 'Chocolate Chip Cookies',
+      description: 'Soft and chewy chocolate chip cookies perfect for dessert',
+      instructions: '1. Cream butter and sugars\n2. Add eggs and vanilla\n3. Mix in dry ingredients\n4. Fold in chocolate chips\n5. Bake at 375°F for 9-11 minutes',
+      prep_time: 20,
+      cook_time: 12,
+      servings: 24,
+      difficulty: 'easy',
+      tags: 'dessert,sweet,baking,cookies',
+      ingredients: [
+        { name: 'butter', quantity: 200, unit: 'g' },
+        { name: 'brown sugar', quantity: 100, unit: 'g' },
+        { name: 'white sugar', quantity: 100, unit: 'g' },
+        { name: 'eggs', quantity: 2, unit: 'pieces' },
+        { name: 'vanilla extract', quantity: 2, unit: 'tsp' },
+        { name: 'flour', quantity: 300, unit: 'g' },
+        { name: 'chocolate chips', quantity: 200, unit: 'g' }
+      ]
+    },
+    {
+      title: 'Greek Yogurt Parfait',
+      description: 'Healthy layered parfait with Greek yogurt, granola, and fresh fruit',
+      instructions: '1. Layer Greek yogurt in glass\n2. Add granola\n3. Top with fresh berries\n4. Drizzle with honey\n5. Repeat layers as desired',
+      prep_time: 5,
+      cook_time: 0,
+      servings: 1,
+      difficulty: 'easy',
+      tags: 'breakfast,snack,healthy,quick',
+      ingredients: [
+        { name: 'Greek yogurt', quantity: 200, unit: 'g' },
+        { name: 'granola', quantity: 50, unit: 'g' },
+        { name: 'fresh berries', quantity: 100, unit: 'g' },
+        { name: 'honey', quantity: 1, unit: 'tbsp' },
+        { name: 'nuts', quantity: 20, unit: 'g' }
       ]
     }
   ];

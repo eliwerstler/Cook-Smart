@@ -6,7 +6,7 @@ const db = getDatabase();
 
 // Get all recipes with ingredients
 router.get('/', (req, res) => {
-  const { search, category, difficulty, limit = 50, offset = 0 } = req.query;
+  const { search, category, difficulty, meal_type, limit = 50, offset = 0 } = req.query;
   
   let query = `
     SELECT r.*, 
@@ -27,6 +27,11 @@ router.get('/', (req, res) => {
   if (difficulty) {
     conditions.push('r.difficulty = ?');
     params.push(difficulty);
+  }
+  
+  if (meal_type) {
+    conditions.push('r.tags LIKE ?');
+    params.push(`%${meal_type}%`);
   }
   
   if (conditions.length > 0) {

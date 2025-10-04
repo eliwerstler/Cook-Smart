@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, Filter, Package, Upload, ShoppingCart, AlertTriangle, CheckSquare, Square, MoreHorizontal, Download, Tag } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Package, Upload, ShoppingCart, AlertTriangle, CheckSquare, Square, Download, Clock, Calendar } from 'lucide-react';
 import { pantryApi } from '../services/api';
 import AddItemModal from './AddItemModal';
 import BulkImportModal from './BulkImportModal';
+import ScrollAnimation from './ScrollAnimation';
 
 interface PantryItem {
   id: number;
@@ -26,11 +27,9 @@ interface Category {
 
 const Pantry: React.FC = () => {
   const [items, setItems] = useState<PantryItem[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'expiration' | 'quantity'>('name');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<PantryItem | null>(null);
@@ -47,13 +46,8 @@ const Pantry: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [itemsResponse, categoriesResponse] = await Promise.all([
-        pantryApi.getItems(),
-        pantryApi.getCategories()
-      ]);
-      
+      const itemsResponse = await pantryApi.getItems();
       setItems(itemsResponse.data);
-      setCategories(categoriesResponse.data);
     } catch (err) {
       console.error('Error loading pantry data:', err);
       setError('Failed to load pantry data');
@@ -225,10 +219,9 @@ const Pantry: React.FC = () => {
     .filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            item.notes.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
       const matchesExpiring = !showExpiringOnly || isExpiringSoon(item.expiration_date) || isExpired(item.expiration_date);
       const matchesLowStock = !showLowStockOnly || item.quantity < 1;
-      return matchesSearch && matchesCategory && matchesExpiring && matchesLowStock;
+      return matchesSearch && matchesExpiring && matchesLowStock;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -264,37 +257,48 @@ const Pantry: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Pantry Management</h1>
-          <p className="text-gray-600 mt-1">Manage your ingredients and track inventory</p>
+      <ScrollAnimation direction="up" delay={0}>
+        <div className="text-center py-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-3 bg-primary-100 rounded-xl">
+              <Package className="w-8 h-8 text-primary-600" />
+            </div>
+            <h1 className="text-4xl font-bold text-primary-700">My Pantry</h1>
+          </div>
+          <p className="text-primary-600 text-lg max-w-2xl mx-auto">
+            Keep track of your ingredients and never run out of what you need
+          </p>
         </div>
-        <div className="flex items-center space-x-3">
+      </ScrollAnimation>
+
+      {/* Quick Actions */}
+      <ScrollAnimation direction="up" delay={100}>
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
           <button
-            onClick={handleGenerateShoppingList}
-            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-sage-500 hover:bg-sage-600 text-white rounded-xl font-medium transition-colors shadow-sm hover:shadow-md"
           >
-            <ShoppingCart size={20} />
-            <span>Shopping List</span>
+            <Plus className="w-5 h-5" />
+            Add Item
           </button>
           <button
             onClick={() => setShowBulkImportModal(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition-colors shadow-sm hover:shadow-md"
           >
-            <Upload size={20} />
-            <span>Bulk Import</span>
+            <Upload className="w-5 h-5" />
+            Bulk Import
           </button>
           <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            onClick={handleGenerateShoppingList}
+            className="flex items-center gap-2 px-6 py-3 bg-blush-500 hover:bg-blush-600 text-white rounded-xl font-medium transition-colors shadow-sm hover:shadow-md"
           >
-            <Plus size={20} />
-            <span>Add Item</span>
+            <ShoppingCart className="w-5 h-5" />
+            Shopping List
           </button>
         </div>
-      </div>
+      </ScrollAnimation>
 
       {/* Filters */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -311,22 +315,6 @@ const Pantry: React.FC = () => {
             />
           </div>
 
-          {/* Category Filter */}
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none"
-            >
-              <option value="all">All Categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
 
           {/* Sort */}
           <select

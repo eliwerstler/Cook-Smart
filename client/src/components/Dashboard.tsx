@@ -23,7 +23,7 @@ interface Recipe {
 const Dashboard: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(true);
   const [allRecipes, setAllRecipes] = useState<Recipe[]>([]);
   const [featuredRecipes, setFeaturedRecipes] = useState<Recipe[]>([]);
   const [visibleRecipes, setVisibleRecipes] = useState<number>(12); // Start with 12 visible recipes
@@ -141,14 +141,14 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center gap-4">
               <Link
                 to="/recipe/new"
-                className="flex items-center gap-2 px-4 py-2 bg-sage-500 hover:bg-sage-600 text-white rounded-xl font-medium transition-colors shadow-sm hover:shadow-md"
+                className="flex items-center gap-2 px-4 py-2 bg-sage-600 hover:bg-sage-700 text-white rounded-xl font-medium transition-colors shadow-sm hover:shadow-md"
               >
                 <Plus className="w-4 h-4" />
                 Add Recipe
               </Link>
               <button 
                 onClick={() => setShowAll(!showAll)}
-                className="text-sage-600 hover:text-sage-700 font-medium transition-colors"
+                className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
               >
                 {showAll ? 'Show Featured →' : 'View All →'}
               </button>

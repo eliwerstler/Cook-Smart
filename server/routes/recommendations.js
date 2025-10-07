@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getDatabase } = require('../database/init');
 const ingredientNormalizer = require('../services/ingredientNormalizer');
+const unitConverter = require('../services/unitConverter');
 
 const db = getDatabase();
 
@@ -179,49 +180,22 @@ function calculateRecipeScore(recipe, pantryItems, strict = false) {
 
 // Check if pantry quantity is sufficient for recipe requirement
 function checkQuantityMatch(pantryItem, recipeIngredient, strict = false) {
+  const ingredientName = ingredientNormalizer.normalize(recipeIngredient.name);
+  
   if (strict) {
     // Strict mode: exact unit matching required
     return pantryItem.unit === recipeIngredient.unit && 
            pantryItem.quantity >= recipeIngredient.quantity;
   }
   
-  // Flexible mode: try to convert units or estimate
-  const pantryQty = pantryItem.quantity;
-  const requiredQty = recipeIngredient.quantity;
+  // Use the unit converter for flexible matching
+  const result = unitConverter.checkSufficientQuantity(
+    { quantity: pantryItem.quantity, unit: pantryItem.unit },
+    { quantity: recipeIngredient.quantity, unit: recipeIngredient.unit },
+    ingredientName
+  );
   
-  // If units match, direct comparison
-  if (pantryItem.unit === recipeIngredient.unit) {
-    return pantryQty >= requiredQty;
-  }
-  
-  // Handle common unit conversions
-  const conversions = {
-    'g': { 'kg': 0.001, 'oz': 0.035274, 'lb': 0.002205 },
-    'kg': { 'g': 1000, 'oz': 35.274, 'lb': 2.205 },
-    'ml': { 'l': 0.001, 'cup': 0.004227, 'tbsp': 0.067628, 'tsp': 0.202884 },
-    'l': { 'ml': 1000, 'cup': 4.227, 'tbsp': 67.628, 'tsp': 202.884 },
-    'cup': { 'ml': 236.588, 'l': 0.236588, 'tbsp': 16, 'tsp': 48 },
-    'tbsp': { 'ml': 14.7868, 'l': 0.0147868, 'cup': 0.0625, 'tsp': 3 },
-    'tsp': { 'ml': 4.92892, 'l': 0.00492892, 'cup': 0.0208333, 'tbsp': 0.333333 },
-    'pieces': { 'piece': 1, 'pcs': 1 },
-    'piece': { 'pieces': 1, 'pcs': 1 },
-    'pcs': { 'pieces': 1, 'piece': 1 }
-  };
-  
-  // Try to convert pantry unit to required unit
-  if (conversions[pantryItem.unit] && conversions[pantryItem.unit][recipeIngredient.unit]) {
-    const convertedQty = pantryQty * conversions[pantryItem.unit][recipeIngredient.unit];
-    return convertedQty >= requiredQty;
-  }
-  
-  // Try reverse conversion
-  if (conversions[recipeIngredient.unit] && conversions[recipeIngredient.unit][pantryItem.unit]) {
-    const convertedQty = requiredQty * conversions[recipeIngredient.unit][pantryItem.unit];
-    return pantryQty >= convertedQty;
-  }
-  
-  // If no conversion available, assume they don't match
-  return false;
+  return result.sufficient;
 }
 
 // Get suggestions for missing ingredients

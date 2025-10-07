@@ -1,8 +1,9 @@
 /**
- * Ingredient Normalization Service
+ * Enhanced Ingredient Normalization Service
  * Normalizes ingredient names to match variations like:
  * - "tomato", "tomatos", "tomatoes", "chopped tomatoes", "cherry tomatoes"
  * - "onion", "onions", "diced onion", "red onion"
+ * - Integrates with unit converter for comprehensive ingredient management
  */
 
 class IngredientNormalizer {
@@ -16,8 +17,177 @@ class IngredientNormalizer {
       'large', 'small', 'medium', 'baby', 'ripe',
       'boneless', 'skinless', 'seedless',
       'extra', 'virgin', 'pure', 'organic',
-      'bunch', 'of', 'can', 'jar'
+      'bunch', 'of', 'can', 'jar', 'bottle', 'bag', 'box'
     ];
+
+    // Standard ingredient mappings for common variations
+    this.standardMappings = {
+      // Tomatoes
+      'tomato': 'tomato',
+      'tomatoes': 'tomato',
+      'cherry tomato': 'tomato',
+      'cherry tomatoes': 'tomato',
+      'plum tomato': 'tomato',
+      'plum tomatoes': 'tomato',
+      'roma tomato': 'tomato',
+      'roma tomatoes': 'tomato',
+      'beefsteak tomato': 'tomato',
+      'beefsteak tomatoes': 'tomato',
+      'grape tomato': 'tomato',
+      'grape tomatoes': 'tomato',
+      
+      // Onions
+      'onion': 'onion',
+      'onions': 'onion',
+      'yellow onion': 'onion',
+      'yellow onions': 'onion',
+      'white onion': 'onion',
+      'white onions': 'onion',
+      'red onion': 'onion',
+      'red onions': 'onion',
+      'sweet onion': 'onion',
+      'sweet onions': 'onion',
+      'vidalia onion': 'onion',
+      'vidalia onions': 'onion',
+      
+      // Garlic
+      'garlic': 'garlic',
+      'garlic clove': 'garlic',
+      'garlic cloves': 'garlic',
+      'garlic bulb': 'garlic',
+      'garlic bulbs': 'garlic',
+      'minced garlic': 'garlic',
+      'garlic powder': 'garlic',
+      
+      // Potatoes
+      'potato': 'potato',
+      'potatoes': 'potato',
+      'russet potato': 'potato',
+      'russet potatoes': 'potato',
+      'red potato': 'potato',
+      'red potatoes': 'potato',
+      'yukon gold potato': 'potato',
+      'yukon gold potatoes': 'potato',
+      'sweet potato': 'sweet potato',
+      'sweet potatoes': 'sweet potato',
+      
+      // Carrots
+      'carrot': 'carrot',
+      'carrots': 'carrot',
+      'baby carrot': 'carrot',
+      'baby carrots': 'carrot',
+      
+      // Peppers
+      'bell pepper': 'bell pepper',
+      'bell peppers': 'bell pepper',
+      'red bell pepper': 'bell pepper',
+      'red bell peppers': 'bell pepper',
+      'green bell pepper': 'bell pepper',
+      'green bell peppers': 'bell pepper',
+      'yellow bell pepper': 'bell pepper',
+      'yellow bell peppers': 'bell pepper',
+      'orange bell pepper': 'bell pepper',
+      'orange bell peppers': 'bell pepper',
+      
+      // Herbs
+      'basil': 'basil',
+      'fresh basil': 'basil',
+      'dried basil': 'basil',
+      'oregano': 'oregano',
+      'fresh oregano': 'oregano',
+      'dried oregano': 'oregano',
+      'thyme': 'thyme',
+      'fresh thyme': 'thyme',
+      'dried thyme': 'thyme',
+      'rosemary': 'rosemary',
+      'fresh rosemary': 'rosemary',
+      'dried rosemary': 'rosemary',
+      'parsley': 'parsley',
+      'fresh parsley': 'parsley',
+      'dried parsley': 'parsley',
+      'cilantro': 'cilantro',
+      'fresh cilantro': 'cilantro',
+      'dried cilantro': 'cilantro',
+      
+      // Dairy
+      'milk': 'milk',
+      'whole milk': 'milk',
+      '2% milk': 'milk',
+      'skim milk': 'milk',
+      'butter': 'butter',
+      'unsalted butter': 'butter',
+      'salted butter': 'butter',
+      'cheese': 'cheese',
+      'cheddar cheese': 'cheddar cheese',
+      'mozzarella cheese': 'mozzarella cheese',
+      'parmesan cheese': 'parmesan cheese',
+      'cream cheese': 'cream cheese',
+      'sour cream': 'sour cream',
+      'yogurt': 'yogurt',
+      'greek yogurt': 'greek yogurt',
+      'plain yogurt': 'yogurt',
+      
+      // Meats
+      'chicken': 'chicken',
+      'chicken breast': 'chicken',
+      'chicken breasts': 'chicken',
+      'chicken thigh': 'chicken',
+      'chicken thighs': 'chicken',
+      'ground chicken': 'ground chicken',
+      'beef': 'beef',
+      'ground beef': 'ground beef',
+      'beef steak': 'beef',
+      'beef steaks': 'beef',
+      'pork': 'pork',
+      'ground pork': 'ground pork',
+      'pork chop': 'pork',
+      'pork chops': 'pork',
+      
+      // Grains
+      'rice': 'rice',
+      'white rice': 'rice',
+      'brown rice': 'brown rice',
+      'jasmine rice': 'rice',
+      'basmati rice': 'rice',
+      'pasta': 'pasta',
+      'spaghetti': 'pasta',
+      'penne pasta': 'pasta',
+      'macaroni': 'pasta',
+      'bread': 'bread',
+      'white bread': 'bread',
+      'whole wheat bread': 'bread',
+      'flour': 'flour',
+      'all-purpose flour': 'flour',
+      'bread flour': 'flour',
+      'whole wheat flour': 'flour',
+      
+      // Oils and fats
+      'olive oil': 'olive oil',
+      'extra virgin olive oil': 'olive oil',
+      'vegetable oil': 'vegetable oil',
+      'canola oil': 'vegetable oil',
+      'coconut oil': 'coconut oil',
+      'butter': 'butter',
+      
+      // Spices
+      'salt': 'salt',
+      'sea salt': 'salt',
+      'kosher salt': 'salt',
+      'black pepper': 'black pepper',
+      'ground black pepper': 'black pepper',
+      'cayenne pepper': 'cayenne pepper',
+      'paprika': 'paprika',
+      'cumin': 'cumin',
+      'ground cumin': 'cumin',
+      'cinnamon': 'cinnamon',
+      'ground cinnamon': 'cinnamon',
+      'nutmeg': 'nutmeg',
+      'ground nutmeg': 'nutmeg',
+      'ginger': 'ginger',
+      'fresh ginger': 'ginger',
+      'ground ginger': 'ginger',
+      'ginger powder': 'ginger'
+    };
 
     // Common ingredient variations that should be normalized to the same base
     this.varietyWords = [
@@ -49,6 +219,11 @@ class IngredientNormalizer {
 
     let normalized = ingredient.toLowerCase().trim();
 
+    // Check for exact match in standard mappings first
+    if (this.standardMappings[normalized]) {
+      return this.standardMappings[normalized];
+    }
+
     // Remove parentheses and their contents
     normalized = normalized.replace(/\([^)]*\)/g, '');
 
@@ -65,6 +240,11 @@ class IngredientNormalizer {
 
     // Rejoin words
     normalized = words.join(' ').trim();
+
+    // Check again for standard mapping after cleaning
+    if (this.standardMappings[normalized]) {
+      return this.standardMappings[normalized];
+    }
 
     // Convert plural to singular
     normalized = this.singularize(normalized);
@@ -165,6 +345,86 @@ class IngredientNormalizer {
     });
 
     return groups;
+  }
+
+  /**
+   * Get the standard name for an ingredient
+   * @param {string} ingredient - The ingredient name
+   * @returns {string} - Standard ingredient name
+   */
+  getStandardName(ingredient) {
+    const normalized = this.normalize(ingredient);
+    
+    // Check if we have a standard mapping for this ingredient
+    for (const [standard, mapping] of Object.entries(this.standardMappings)) {
+      if (mapping === normalized) {
+        return normalized;
+      }
+    }
+    
+    return normalized;
+  }
+
+  /**
+   * Check if an ingredient is a special ingredient that needs custom unit conversion
+   * @param {string} ingredient - The ingredient name
+   * @returns {boolean} - True if it's a special ingredient
+   */
+  isSpecialIngredient(ingredient) {
+    const normalized = this.normalize(ingredient);
+    const specialIngredients = ['butter', 'flour', 'sugar', 'rice', 'oil', 'milk'];
+    return specialIngredients.includes(normalized);
+  }
+
+  /**
+   * Suggest alternative names for an ingredient
+   * @param {string} ingredient - The ingredient name
+   * @returns {Array} - Array of alternative names
+   */
+  getAlternativeNames(ingredient) {
+    const normalized = this.normalize(ingredient);
+    const alternatives = [];
+    
+    // Find all ingredients that normalize to the same standard
+    for (const [original, standard] of Object.entries(this.standardMappings)) {
+      if (standard === normalized && original !== ingredient.toLowerCase()) {
+        alternatives.push(original);
+      }
+    }
+    
+    return alternatives;
+  }
+
+  /**
+   * Get all standard ingredient names
+   * @returns {Array} - Array of all standard ingredient names
+   */
+  getAllStandardNames() {
+    const standards = new Set();
+    for (const standard of Object.values(this.standardMappings)) {
+      standards.add(standard);
+    }
+    return Array.from(standards).sort();
+  }
+
+  /**
+   * Validate and suggest corrections for ingredient names
+   * @param {string} ingredient - The ingredient name to validate
+   * @returns {Object} - Validation result with suggestions
+   */
+  validateIngredient(ingredient) {
+    const normalized = this.normalize(ingredient);
+    const standard = this.getStandardName(ingredient);
+    const alternatives = this.getAlternativeNames(ingredient);
+    
+    return {
+      original: ingredient,
+      normalized: normalized,
+      standard: standard,
+      alternatives: alternatives,
+      isValid: normalized === standard,
+      needsCorrection: normalized !== standard && alternatives.length > 0
+    };
   }
 }
 

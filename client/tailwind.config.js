@@ -13,11 +13,11 @@ module.exports = {
           200: '#d1d5d9',
           300: '#a8b0b7',
           400: '#7d8994',
-          500: '#4A5759',  // Main dark slate
-          600: '#3e494b',
-          700: '#323b3d',
-          800: '#262d2f',
-          900: '#1a1f21',
+          500: '#2C3E50',  // Deeper, more contrasted slate blue
+          600: '#243342',
+          700: '#1c2833',
+          800: '#151d25',
+          900: '#0f1418',
         },
         sage: {
           50: '#f7f8f7',
@@ -25,11 +25,11 @@ module.exports = {
           200: '#dde1dd',
           300: '#c4ccc5',
           400: '#a5b1a6',
-          500: '#B0C4B1',  // Main sage green
-          600: '#9eb09f',
-          700: '#8a9c8b',
-          800: '#768876',
-          900: '#5f6f60',
+          500: '#6B8E5A',  // Deeper, more vibrant sage green
+          600: '#5a7a4b',
+          700: '#4a653d',
+          800: '#3b512f',
+          900: '#2d3e23',
         },
         cream: {
           50: '#fefdfc',

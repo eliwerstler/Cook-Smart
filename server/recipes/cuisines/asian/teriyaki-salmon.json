@@ -1,0 +1,80 @@
+{
+  "title": "Teriyaki Glazed Salmon",
+  "description": "Perfectly cooked salmon fillets with a glossy teriyaki glaze. The fish is pan-seared to create a crispy exterior while remaining tender and flaky inside, then finished with a sweet and savory teriyaki sauce.",
+  "instructions": "1. Pat the salmon fillets dry with paper towels and season with salt and pepper.\n2. In a small saucepan, combine soy sauce, mirin, sake, sugar, and ginger. Bring to a simmer over medium heat and cook until reduced by half and syrupy, about 8-10 minutes.\n3. Heat oil in a large non-stick skillet over medium-high heat. Place salmon skin-side up and cook for 4-5 minutes until golden brown.\n4. Carefully flip the salmon and cook for another 3-4 minutes until cooked through.\n5. Brush the teriyaki glaze over the salmon and cook for 1 more minute, basting frequently.\n6. Remove from heat and let rest for 2 minutes.\n7. Serve over steamed rice with steamed broccoli and drizzle with remaining teriyaki sauce.\n8. Garnish with sliced green onions and sesame seeds.",
+  "prep_time": 15,
+  "cook_time": 20,
+  "servings": 4,
+  "difficulty": "medium",
+  "tags": "asian,japanese,salmon,seafood,healthy,dinner,gluten-free",
+  "source_url": "https://www.justonecookbook.com/teriyaki-salmon/",
+  "image_url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800",
+  "ingredients": [
+    {
+      "name": "salmon fillets",
+      "quantity": 600,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "soy sauce",
+      "quantity": 60,
+      "unit": "ml",
+      "optional": false
+    },
+    {
+      "name": "mirin",
+      "quantity": 30,
+      "unit": "ml",
+      "optional": false
+    },
+    {
+      "name": "sake",
+      "quantity": 30,
+      "unit": "ml",
+      "optional": false
+    },
+    {
+      "name": "sugar",
+      "quantity": 30,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "fresh ginger",
+      "quantity": 2,
+      "unit": "tsp",
+      "optional": false
+    },
+    {
+      "name": "vegetable oil",
+      "quantity": 2,
+      "unit": "tbsp",
+      "optional": false
+    },
+    {
+      "name": "salt",
+      "quantity": 1,
+      "unit": "tsp",
+      "optional": false
+    },
+    {
+      "name": "black pepper",
+      "quantity": 0.5,
+      "unit": "tsp",
+      "optional": false
+    },
+    {
+      "name": "green onions",
+      "quantity": 2,
+      "unit": "pieces",
+      "optional": true
+    },
+    {
+      "name": "sesame seeds",
+      "quantity": 1,
+      "unit": "tbsp",
+      "optional": true
+    }
+  ]
+}

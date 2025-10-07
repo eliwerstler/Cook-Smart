@@ -43,6 +43,8 @@ Cook Smart follows a **client-server architecture** with clear separation betwee
 - **Component-Based UI**: Reusable React components
 - **Type Safety**: TypeScript for frontend type checking
 - **Security**: CORS, rate limiting, and helmet middleware
+- **Scalable Recipe Management**: External recipe sources with quality validation
+- **Ingredient Standardization**: Automatic normalization and unit conversion
 
 ---
 
@@ -531,7 +533,7 @@ Return import statistics
 
 ### 1. Recipe Recommendation Algorithm
 
-**Objective**: Match recipes to user's pantry items
+**Objective**: Match recipes to user's pantry items with ingredient standardization and unit conversion
 
 **Algorithm**:
 ```javascript
@@ -545,9 +547,23 @@ function recommendRecipes(pantryItems, matchMode) {
     const missingIngredients = [];
     
     for (const recipeIng of recipeIngredients) {
-      const found = pantryItems.some(pantryItem => 
-        fuzzyMatch(pantryItem.name, recipeIng.name)
-      );
+      // Standardize ingredient name
+      const normalizedRecipeIngredient = ingredientNormalizer.normalize(recipeIng.name);
+      
+      // Find matching pantry item with standardized names
+      const found = pantryItems.find(pantryItem => {
+        const normalizedPantryIngredient = ingredientNormalizer.normalize(pantryItem.name);
+        
+        if (normalizedPantryIngredient === normalizedRecipeIngredient) {
+          // Check quantity sufficiency with unit conversion
+          return unitConverter.checkSufficientQuantity(
+            { quantity: pantryItem.quantity, unit: pantryItem.unit },
+            { quantity: recipeIng.quantity, unit: recipeIng.unit },
+            normalizedRecipeIngredient
+          ).sufficient;
+        }
+        return false;
+      });
       
       if (found) {
         matchCount++;
@@ -580,10 +596,86 @@ function recommendRecipes(pantryItems, matchMode) {
 }
 ```
 
-**Fuzzy Matching**:
-- Case-insensitive comparison
-- Removes plurals (e.g., "tomato" matches "tomatoes")
-- Handles common variations (e.g., "chicken breast" matches "chicken")
+**Key Improvements**:
+- **Ingredient Standardization**: Uses `ingredientNormalizer` to match "cherry tomatoes" with "tomato"
+- **Unit Conversion**: Automatically converts between units (cups, grams, ml, etc.)
+- **Quantity Checking**: Verifies sufficient quantities after unit conversion
+
+### 2. Ingredient Standardization Algorithm
+
+**Objective**: Normalize ingredient names and units across recipes and pantry items
+
+**Ingredient Normalization**:
+```javascript
+function normalizeIngredient(ingredientName) {
+  // Apply standard mappings (cherry tomato → tomato)
+  const standardMappings = {
+    'cherry tomato': 'tomato',
+    'beef mince': 'ground beef',
+    'minced beef': 'ground beef'
+  };
+  
+  // Normalize case and remove plurals
+  let normalized = ingredientName.toLowerCase()
+    .replace(/s$/, '') // Remove trailing 's'
+    .trim();
+  
+  // Apply standard mappings
+  return standardMappings[normalized] || normalized;
+}
+```
+
+**Unit Conversion**:
+```javascript
+function convertUnits(fromUnit, toUnit, ingredient, quantity) {
+  // Get unit types (mass, volume, count)
+  const fromType = getUnitType(fromUnit);
+  const toType = getUnitType(toUnit);
+  
+  // Handle special ingredient conversions (flour, butter, etc.)
+  if (hasSpecialConversion(ingredient)) {
+    return applySpecialConversion(ingredient, quantity, fromUnit, toUnit);
+  }
+  
+  // Standard unit conversion
+  const conversionFactor = getConversionFactor(fromUnit, toUnit);
+  return quantity * conversionFactor;
+}
+```
+
+### 3. Recipe Quality Validation Algorithm
+
+**Objective**: Validate and score recipe quality during import
+
+**Quality Scoring**:
+```javascript
+function calculateQualityScore(recipe) {
+  let score = 0;
+  const maxScore = 100;
+  
+  // Title quality (10 points)
+  if (recipe.title && recipe.title.length > 5) score += 10;
+  
+  // Description quality (15 points)
+  if (recipe.description && recipe.description.length > 20) score += 15;
+  
+  // Instructions quality (25 points)
+  if (recipe.instructions && recipe.instructions.length > 50) score += 25;
+  
+  // Ingredient completeness (20 points)
+  if (recipe.ingredients && recipe.ingredients.length >= 3) score += 20;
+  
+  // Time information (15 points)
+  if (recipe.prep_time > 0 || recipe.cook_time > 0) score += 15;
+  
+  // Additional metadata (15 points)
+  if (recipe.servings > 0) score += 5;
+  if (recipe.difficulty) score += 5;
+  if (recipe.tags && recipe.tags.length > 0) score += 5;
+  
+  return Math.min(score, maxScore);
+}
+```
 
 ### 2. Difficulty Classification
 

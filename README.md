@@ -16,9 +16,13 @@ Cook Smart is a full-stack web application that helps users manage their pantry 
 - **Recipe Details**: Complete instructions, prep/cook times, difficulty levels, and ratings
 - **Smart Search**: Search recipes by title, description, tags, or difficulty
 - **Recipe Rating**: Rate and review your favorite recipes
+- **Quality Validation**: Automatic recipe quality scoring and validation
+- **External Sources**: Import recipes from JSON files, TheMealDB, and other APIs
 
 ### Intelligent Recommendations
 - **Smart Matching**: Algorithm matches recipes based on available pantry ingredients
+- **Ingredient Standardization**: Automatic normalization of ingredient names (e.g., "cherry tomatoes" → "tomato")
+- **Unit Conversion**: Intelligent conversion between units (cups, grams, ml, etc.)
 - **Flexible Matching**: Choose between strict or flexible ingredient matching modes
 - **Match Scoring**: See how well each recipe matches your pantry (percentage and score)
 - **Missing Ingredients**: View what ingredients you need to buy for each recipe
@@ -44,6 +48,9 @@ Cook Smart is a full-stack web application that helps users manage their pantry 
 - **SQLite** database for data persistence
 - **RESTful API** architecture
 - **Security middleware** (Helmet, CORS, Rate limiting)
+- **Ingredient normalization** and unit conversion services
+- **Recipe validation** and quality scoring system
+- **JSON recipe import** system with external API integration
 
 ### Development Tools
 - **Concurrently** for running frontend and backend simultaneously
@@ -155,6 +162,14 @@ If you prefer to set up each part separately:
 - `DELETE /api/recipes/:id` - Delete recipe
 - `POST /api/recipes/:id/rate` - Rate a recipe
 
+### Recipe Import & Validation
+- `POST /api/import/mealdb` - Import recipes from TheMealDB
+- `POST /api/import/json/file` - Import recipe from JSON file
+- `POST /api/import/json/directory` - Import all recipes from JSON directory
+- `POST /api/import/validate` - Validate recipe quality and structure
+- `GET /api/import/statistics` - Get import statistics
+- `POST /api/import/bulk` - Bulk import from multiple sources
+
 ### Recommendations
 - `GET /api/recommendations/recipes` - Get recipe recommendations
 - `GET /api/recommendations/suggestions/:recipeId` - Get missing ingredients for a recipe
@@ -163,10 +178,11 @@ If you prefer to set up each part separately:
 ## Database Schema
 
 ### Tables
-- **pantry_items**: Stores pantry inventory data
+- **pantry_items**: Stores pantry inventory data with standardized ingredient names and units
 - **categories**: Pantry item categories with colors
-- **recipes**: Recipe information (title, instructions, etc.)
-- **recipe_ingredients**: Ingredients for each recipe
+- **recipes**: Recipe information with quality scoring and source tracking
+  - Enhanced schema includes: `source_type`, `quality_score`, `last_validated`, `validation_errors`
+- **recipe_ingredients**: Ingredients for each recipe with standardized names and units
 - **user_preferences**: User dietary preferences (for future features)
 
 ## Configuration
@@ -197,6 +213,15 @@ Cook-Smart/
 ├── server/                 # Node.js backend
 │   ├── routes/            # API route handlers
 │   ├── database/          # Database initialization
+│   ├── services/          # Business logic services
+│   │   ├── ingredientNormalizer.js
+│   │   ├── unitConverter.js
+│   │   ├── recipeValidator.js
+│   │   └── jsonRecipeImporter.js
+│   ├── recipes/           # JSON recipe files
+│   │   ├── cuisines/      # Recipes organized by cuisine
+│   │   ├── categories/    # Recipes organized by meal type
+│   │   └── sources/       # Recipes from external sources
 │   └── ...
 ├── package.json           # Root package.json
 └── README.md
@@ -207,6 +232,9 @@ Cook-Smart/
 1. **New API Endpoints**: Add routes in `server/routes/`
 2. **New Components**: Create React components in `client/src/components/`
 3. **Database Changes**: Update schema in `server/database/init.js`
+4. **New Recipe Sources**: Add JSON files to `server/recipes/` or extend import services
+5. **Ingredient Normalization**: Update mappings in `server/services/ingredientNormalizer.js`
+6. **Unit Conversions**: Add new units or special conversions in `server/services/unitConverter.js`
 
 ## Contributing
 
@@ -218,6 +246,10 @@ Cook-Smart/
 
 ## Future Enhancements
 
+- [x] Ingredient standardization and unit conversion
+- [x] Recipe quality validation and scoring
+- [x] JSON recipe import system
+- [x] External API integration (TheMealDB)
 - [ ] User authentication and profiles
 - [ ] Recipe sharing and social features
 - [ ] Shopping list generation
@@ -225,7 +257,7 @@ Cook-Smart/
 - [ ] Nutrition information integration
 - [ ] Barcode scanning for easy item addition
 - [ ] Mobile app (React Native)
-- [ ] Recipe import from popular cooking websites
+- [ ] Additional recipe source integrations (Spoonacular, etc.)
 - [ ] Dietary restriction filtering
 - [ ] Grocery store price tracking
 

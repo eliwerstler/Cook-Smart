@@ -15,6 +15,12 @@ interface PantryItem {
   allergens?: string;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  color: string;
+}
+
 interface AddItemModalProps {
   categories: Category[];
   item?: PantryItem | null;
@@ -132,6 +138,27 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ categories, item, onSubmit,
               placeholder="e.g., Organic Tomatoes"
               required
             />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-primary-700 mb-2">
+              <Tag className="w-4 h-4 inline mr-1" />
+              Category *
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) => handleChange('category', e.target.value)}
+              className="w-full px-4 py-3 border border-greige-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+              required
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Quantity and Unit */}

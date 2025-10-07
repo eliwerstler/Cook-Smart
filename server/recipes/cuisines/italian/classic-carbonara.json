@@ -1,0 +1,50 @@
+{
+  "title": "Classic Spaghetti Carbonara",
+  "description": "Authentic Italian carbonara made with eggs, Pecorino Romano cheese, guanciale, and black pepper. This traditional Roman dish is creamy without cream, relying on the emulsion of egg and cheese for its signature texture.",
+  "instructions": "1. Bring a large pot of salted water to boil for the pasta.\n2. Cut the guanciale into small cubes and render in a large pan over medium heat until crispy, about 8-10 minutes. Remove from heat and set aside, keeping the rendered fat in the pan.\n3. In a large bowl, whisk together the eggs, grated Pecorino Romano, and a generous amount of black pepper until well combined.\n4. Cook the spaghetti according to package directions until al dente, reserving 1 cup of pasta water before draining.\n5. Return the pan with guanciale fat to medium heat. Add the drained pasta and toss to coat with the fat.\n6. Remove the pan from heat and quickly add the egg mixture, tossing vigorously while adding pasta water a little at a time until you achieve a creamy consistency.\n7. Add the crispy guanciale and toss once more.\n8. Serve immediately with additional grated cheese and black pepper.",
+  "prep_time": 15,
+  "cook_time": 20,
+  "servings": 4,
+  "difficulty": "medium",
+  "tags": "italian,roman,pasta,traditional,comfort food,dinner",
+  "source_url": "https://www.recipetineats.com/spaghetti-carbonara/",
+  "image_url": "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=800",
+  "ingredients": [
+    {
+      "name": "spaghetti",
+      "quantity": 400,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "guanciale",
+      "quantity": 150,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "eggs",
+      "quantity": 4,
+      "unit": "pieces",
+      "optional": false
+    },
+    {
+      "name": "pecorino romano cheese",
+      "quantity": 100,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "black pepper",
+      "quantity": 2,
+      "unit": "tsp",
+      "optional": false
+    },
+    {
+      "name": "salt",
+      "quantity": 1,
+      "unit": "tsp",
+      "optional": false
+    }
+  ]
+}

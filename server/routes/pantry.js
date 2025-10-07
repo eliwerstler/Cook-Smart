@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getDatabase } = require('../database/init');
 const ingredientNormalizer = require('../services/ingredientNormalizer');
+const unitConverter = require('../services/unitConverter');
 
 const db = getDatabase();
 
@@ -44,7 +45,7 @@ router.get('/items/category/:category', (req, res) => {
   });
 });
 
-// Add new pantry item
+// Add new pantry item with automatic standardization
 router.post('/items', (req, res) => {
   const { name, category, quantity, unit, expiration_date, notes, dietary_tags, allergens } = req.body;
 
@@ -54,6 +55,10 @@ router.post('/items', (req, res) => {
     });
   }
 
+  // Standardize ingredient name and unit
+  const standardizedName = ingredientNormalizer.getStandardName(name);
+  const standardizedUnit = unitConverter.normalizeUnit(unit || 'pieces');
+
   const query = `
     INSERT INTO pantry_items (name, category, quantity, unit, expiration_date, notes, dietary_tags, allergens)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -62,7 +67,7 @@ router.post('/items', (req, res) => {
   const dietaryTagsStr = Array.isArray(dietary_tags) ? dietary_tags.join(',') : dietary_tags || '';
   const allergensStr = Array.isArray(allergens) ? allergens.join(',') : allergens || '';
 
-  db.run(query, [name, category, quantity, unit || 'pieces', expiration_date, notes, dietaryTagsStr, allergensStr], function(err) {
+  db.run(query, [standardizedName, category, quantity, standardizedUnit, expiration_date, notes, dietaryTagsStr, allergensStr], function(err) {
     if (err) {
       console.error('Error adding pantry item:', err);
       return res.status(500).json({ error: 'Failed to add pantry item' });
@@ -70,7 +75,11 @@ router.post('/items', (req, res) => {
 
     res.status(201).json({
       id: this.lastID,
-      message: 'Pantry item added successfully'
+      message: 'Pantry item added successfully',
+      standardized: {
+        name: standardizedName,
+        unit: standardizedUnit
+      }
     });
   });
 });
@@ -604,6 +613,114 @@ router.get('/stats', (req, res) => {
       }
     });
   });
+});
+
+// Get supported units for conversion
+router.get('/units', (req, res) => {
+  try {
+    const units = unitConverter.getAllUnits();
+    res.json({
+      success: true,
+      units: units
+    });
+  } catch (error) {
+    console.error('Error getting units:', error);
+    res.status(500).json({ error: 'Failed to get units' });
+  }
+});
+
+// Convert units
+router.post('/convert', (req, res) => {
+  const { quantity, fromUnit, toUnit, ingredient } = req.body;
+
+  if (quantity === undefined || !fromUnit || !toUnit) {
+    return res.status(400).json({
+      error: 'Quantity, fromUnit, and toUnit are required'
+    });
+  }
+
+  try {
+    const converted = unitConverter.convert(quantity, fromUnit, toUnit, ingredient);
+    
+    if (converted === null) {
+      return res.status(400).json({
+        error: 'Units are not compatible for conversion'
+      });
+    }
+
+    res.json({
+      success: true,
+      original: { quantity, unit: fromUnit },
+      converted: { quantity: converted, unit: toUnit },
+      ingredient: ingredient || null
+    });
+  } catch (error) {
+    console.error('Error converting units:', error);
+    res.status(500).json({ error: 'Failed to convert units' });
+  }
+});
+
+// Check if quantity is sufficient for recipe requirement
+router.post('/check-quantity', (req, res) => {
+  const { pantryItem, recipeRequirement, ingredient } = req.body;
+
+  if (!pantryItem || !recipeRequirement) {
+    return res.status(400).json({
+      error: 'Pantry item and recipe requirement are required'
+    });
+  }
+
+  try {
+    const result = unitConverter.checkSufficientQuantity(
+      pantryItem,
+      recipeRequirement,
+      ingredient
+    );
+
+    res.json({
+      success: true,
+      result: result
+    });
+  } catch (error) {
+    console.error('Error checking quantity:', error);
+    res.status(500).json({ error: 'Failed to check quantity' });
+  }
+});
+
+// Get standard ingredient names
+router.get('/standard-ingredients', (req, res) => {
+  try {
+    const ingredients = ingredientNormalizer.getAllStandardNames();
+    res.json({
+      success: true,
+      ingredients: ingredients
+    });
+  } catch (error) {
+    console.error('Error getting standard ingredients:', error);
+    res.status(500).json({ error: 'Failed to get standard ingredients' });
+  }
+});
+
+// Validate and normalize ingredient name
+router.post('/normalize-ingredient', (req, res) => {
+  const { ingredient } = req.body;
+
+  if (!ingredient) {
+    return res.status(400).json({
+      error: 'Ingredient name is required'
+    });
+  }
+
+  try {
+    const result = ingredientNormalizer.validateIngredient(ingredient);
+    res.json({
+      success: true,
+      result: result
+    });
+  } catch (error) {
+    console.error('Error normalizing ingredient:', error);
+    res.status(500).json({ error: 'Failed to normalize ingredient' });
+  }
 });
 
 module.exports = router;

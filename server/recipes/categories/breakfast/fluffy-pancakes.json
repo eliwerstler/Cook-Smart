@@ -1,0 +1,68 @@
+{
+  "title": "Fluffy Buttermilk Pancakes",
+  "description": "Light and airy pancakes with a tender crumb and golden exterior. The buttermilk adds tang and helps create the perfect fluffy texture that makes these pancakes irresistible.",
+  "instructions": "1. In a large bowl, whisk together flour, sugar, baking powder, baking soda, and salt.\n2. In a separate bowl, whisk together buttermilk, eggs, melted butter, and vanilla extract.\n3. Make a well in the center of the dry ingredients and pour in the wet ingredients. Stir gently until just combined - a few lumps are okay.\n4. Heat a griddle or large non-stick pan over medium heat. Lightly grease with butter or cooking spray.\n5. Pour 1/4 cup of batter for each pancake onto the hot griddle. Cook until bubbles form on the surface and the edges look set, about 2-3 minutes.\n6. Flip and cook until golden brown on the other side, about 1-2 minutes more.\n7. Serve immediately with maple syrup, butter, and fresh berries.",
+  "prep_time": 10,
+  "cook_time": 15,
+  "servings": 4,
+  "difficulty": "easy",
+  "tags": "breakfast,american,pancakes,sweet,family-friendly",
+  "source_url": "https://www.allrecipes.com/recipe/24530/buttermilk-pancakes-ii/",
+  "image_url": "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800",
+  "ingredients": [
+    {
+      "name": "all-purpose flour",
+      "quantity": 250,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "sugar",
+      "quantity": 30,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "baking powder",
+      "quantity": 2,
+      "unit": "tsp",
+      "optional": false
+    },
+    {
+      "name": "baking soda",
+      "quantity": 1,
+      "unit": "tsp",
+      "optional": false
+    },
+    {
+      "name": "salt",
+      "quantity": 1,
+      "unit": "tsp",
+      "optional": false
+    },
+    {
+      "name": "buttermilk",
+      "quantity": 480,
+      "unit": "ml",
+      "optional": false
+    },
+    {
+      "name": "eggs",
+      "quantity": 2,
+      "unit": "pieces",
+      "optional": false
+    },
+    {
+      "name": "butter",
+      "quantity": 60,
+      "unit": "g",
+      "optional": false
+    },
+    {
+      "name": "vanilla extract",
+      "quantity": 1,
+      "unit": "tsp",
+      "optional": false
+    }
+  ]
+}

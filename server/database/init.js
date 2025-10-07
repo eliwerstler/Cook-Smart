@@ -61,6 +61,10 @@ const initializeDatabase = () => {
           difficulty TEXT DEFAULT 'easy',
           image_url TEXT,
           source_url TEXT,
+          source_type TEXT DEFAULT 'manual',
+          quality_score REAL DEFAULT 0.0,
+          last_validated DATETIME,
+          validation_errors TEXT,
           rating REAL DEFAULT 0,
           tags TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -117,8 +121,7 @@ const initializeDatabase = () => {
 
       stmt.finalize();
 
-      // Insert sample recipes
-      insertSampleRecipes();
+      // Sample recipes removed - use import system instead
 
       console.log('Database tables created successfully');
       resolve();

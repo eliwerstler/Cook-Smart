@@ -26,6 +26,14 @@ export const pantryApi = {
   getCategories: () => api.get('/pantry/categories'),
   addCategory: (category: any) => api.post('/pantry/categories', category),
   getStats: () => api.get('/pantry/stats'),
+  // New standardization and conversion endpoints
+  getSupportedUnits: () => api.get('/pantry/units'),
+  convertUnits: (quantity: number, fromUnit: string, toUnit: string, ingredient?: string) =>
+    api.post('/pantry/convert', { quantity, fromUnit, toUnit, ingredient }),
+  checkQuantitySufficient: (pantryItem: any, recipeRequirement: any, ingredient?: string) =>
+    api.post('/pantry/check-quantity', { pantryItem, recipeRequirement, ingredient }),
+  getStandardIngredients: () => api.get('/pantry/standard-ingredients'),
+  normalizeIngredient: (ingredient: string) => api.post('/pantry/normalize-ingredient', { ingredient }),
 };
 
 // Recipes API

@@ -49,14 +49,14 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                     onClick={() => setActiveTab(item.id)}
                     className={`relative flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ease-in-out transform ${
                       active
-                        ? `bg-${colorClass}-500 text-white shadow-lg scale-105 border-2 border-${colorClass}-600`
-                        : `text-${colorClass}-700 hover:text-${colorClass}-800 hover:bg-white hover:shadow-md hover:scale-102 border-2 border-transparent`
+                        ? `bg-${colorClass}-600 text-white shadow-lg scale-105 border-2 border-${colorClass}-700`
+                        : `text-${colorClass}-800 hover:text-${colorClass}-900 hover:bg-white hover:shadow-md hover:scale-102 border-2 border-transparent bg-white/50`
                     }`}
                   >
                     <Icon size={18} className="transition-transform duration-300" />
                     <span className="font-semibold">{item.label}</span>
                     {active && (
-                      <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-${colorClass}-300 rounded-full animate-pulse`}></div>
+                      <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-${colorClass}-400 rounded-full animate-pulse`}></div>
                     )}
                   </Link>
                 );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, Package, Upload, ShoppingCart, AlertTriangle, CheckSquare, Square, Download, Clock, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Package, Upload, ShoppingCart, AlertTriangle, CheckSquare, Square, Download, Clock, Calendar, Tag } from 'lucide-react';
 import { pantryApi } from '../services/api';
 import AddItemModal from './AddItemModal';
 import BulkImportModal from './BulkImportModal';
@@ -27,9 +27,11 @@ interface Category {
 
 const Pantry: React.FC = () => {
   const [items, setItems] = useState<PantryItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState<'name' | 'expiration' | 'quantity'>('name');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<PantryItem | null>(null);
@@ -46,8 +48,12 @@ const Pantry: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const itemsResponse = await pantryApi.getItems();
+      const [itemsResponse, categoriesResponse] = await Promise.all([
+        pantryApi.getItems(),
+        pantryApi.getCategories()
+      ]);
       setItems(itemsResponse.data);
+      setCategories(categoriesResponse.data);
     } catch (err) {
       console.error('Error loading pantry data:', err);
       setError('Failed to load pantry data');

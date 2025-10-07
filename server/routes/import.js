@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const MealDbImporter = require('../services/mealDbImporter');
+const JsonRecipeImporter = require('../services/jsonRecipeImporter');
+const recipeValidator = require('../services/recipeValidator');
 
 // Import sample data from TheMealDB
 router.post('/mealdb/sample', async (req, res) => {
@@ -157,6 +159,194 @@ router.get('/status', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to get import status',
+      details: error.message
+    });
+  }
+});
+
+// Import recipes from JSON file
+router.post('/json/file', async (req, res) => {
+  try {
+    const { filePath, validate = true, standardize = true, minQualityScore = 0.7, overwrite = false } = req.body;
+
+    if (!filePath) {
+      return res.status(400).json({
+        success: false,
+        error: 'File path is required'
+      });
+    }
+
+    const importer = new JsonRecipeImporter();
+    const result = await importer.importFromFile(filePath, {
+      validate,
+      standardize,
+      minQualityScore,
+      overwrite
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error importing from JSON file:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to import from JSON file',
+      details: error.message
+    });
+  }
+});
+
+// Import recipes from JSON directory
+router.post('/json/directory', async (req, res) => {
+  try {
+    const { 
+      directoryPath, 
+      recursive = true, 
+      validate = true, 
+      standardize = true, 
+      minQualityScore = 0.7, 
+      overwrite = false 
+    } = req.body;
+
+    if (!directoryPath) {
+      return res.status(400).json({
+        success: false,
+        error: 'Directory path is required'
+      });
+    }
+
+    const importer = new JsonRecipeImporter();
+    const result = await importer.importFromDirectory(directoryPath, {
+      recursive,
+      validate,
+      standardize,
+      minQualityScore,
+      overwrite
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error importing from JSON directory:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to import from JSON directory',
+      details: error.message
+    });
+  }
+});
+
+// Validate recipe without importing
+router.post('/validate', async (req, res) => {
+  try {
+    const { recipe } = req.body;
+
+    if (!recipe) {
+      return res.status(400).json({
+        success: false,
+        error: 'Recipe data is required'
+      });
+    }
+
+    const validation = recipeValidator.validateRecipe(recipe);
+    const suggestions = recipeValidator.getImprovementSuggestions(recipe);
+
+    res.json({
+      success: true,
+      validation,
+      suggestions
+    });
+  } catch (error) {
+    console.error('Error validating recipe:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to validate recipe',
+      details: error.message
+    });
+  }
+});
+
+// Get enhanced import statistics
+router.get('/statistics', async (req, res) => {
+  try {
+    const importer = new JsonRecipeImporter();
+    const stats = await importer.getImportStatistics();
+
+    res.json({
+      success: true,
+      statistics: stats
+    });
+  } catch (error) {
+    console.error('Error getting import statistics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get import statistics',
+      details: error.message
+    });
+  }
+});
+
+// Bulk import from multiple sources
+router.post('/bulk', async (req, res) => {
+  try {
+    const { 
+      sources = ['themealdb'], 
+      categories = [], 
+      limit = 50, 
+      minQualityScore = 0.7,
+      validate = true,
+      standardize = true 
+    } = req.body;
+
+    const results = {
+      total: 0,
+      imported: 0,
+      skipped: 0,
+      errors: [],
+      sources: {}
+    };
+
+    // Import from TheMealDB if requested
+    if (sources.includes('themealdb')) {
+      try {
+        const importer = new MealDbImporter();
+        const mealdbResult = await importer.importSampleData();
+        results.sources.themealdb = mealdbResult;
+        results.imported += mealdbResult.recipes || 0;
+      } catch (error) {
+        results.errors.push(`TheMealDB: ${error.message}`);
+      }
+    }
+
+    // Import from JSON files if requested
+    if (sources.includes('json')) {
+      try {
+        const jsonImporter = new JsonRecipeImporter();
+        const jsonResult = await jsonImporter.importFromDirectory('./server/recipes', {
+          recursive: true,
+          validate,
+          standardize,
+          minQualityScore
+        });
+        results.sources.json = jsonResult;
+        results.imported += jsonResult.imported || 0;
+        results.skipped += jsonResult.skipped || 0;
+        results.errors.push(...(jsonResult.errors || []));
+      } catch (error) {
+        results.errors.push(`JSON: ${error.message}`);
+      }
+    }
+
+    results.total = results.imported + results.skipped;
+
+    res.json({
+      success: true,
+      results,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error in bulk import:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to perform bulk import',
       details: error.message
     });
   }

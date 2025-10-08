@@ -1,0 +1,26 @@
+{
+  "title": "Honey Garlic Chicken Thighs",
+  "description": "Succulent chicken thighs glazed with a sweet and savory honey garlic sauce, perfect for a quick weeknight dinner.",
+  "instructions": "1. Pat chicken thighs dry with paper towels and season both sides generously with salt and pepper.\n2. Heat olive oil in a large skillet over medium-high heat. Add chicken thighs skin-side down and cook for 6-7 minutes until golden brown and crispy. Flip and cook for another 5-6 minutes. Remove chicken and set aside.\n3. In the same skillet, reduce heat to medium. Add minced garlic and sauté for 30 seconds until fragrant, being careful not to burn.\n4. Add honey, soy sauce, rice vinegar, and a pinch of red pepper flakes. Stir well and bring to a simmer. Let the sauce reduce for 2-3 minutes until it thickens slightly.\n5. Return the chicken thighs to the skillet, skin-side up. Spoon the sauce over the chicken and let it simmer for another 3-4 minutes, allowing the flavors to meld.\n6. Garnish with sliced green onions and sesame seeds if desired. Serve hot with steamed rice or vegetables.",
+  "prep_time": 10,
+  "cook_time": 20,
+  "servings": 4,
+  "difficulty": "easy",
+  "image_url": "",
+  "source_url": "",
+  "tags": "chicken,dinner,asian,quick,easy,gluten-free-option",
+  "ingredients": [
+    {"name": "chicken thigh", "quantity": 6, "unit": "pieces"},
+    {"name": "olive oil", "quantity": 2, "unit": "tbsp"},
+    {"name": "garlic", "quantity": 4, "unit": "cloves"},
+    {"name": "honey", "quantity": 60, "unit": "ml"},
+    {"name": "soy sauce", "quantity": 45, "unit": "ml"},
+    {"name": "rice vinegar", "quantity": 15, "unit": "ml"},
+    {"name": "red pepper flakes", "quantity": 1, "unit": "g"},
+    {"name": "salt", "quantity": 5, "unit": "g"},
+    {"name": "black pepper", "quantity": 2, "unit": "g"},
+    {"name": "green onion", "quantity": 2, "unit": "pieces"},
+    {"name": "sesame seed", "quantity": 5, "unit": "g"}
+  ]
+}
+

@@ -1,0 +1,26 @@
+{
+  "title": "Authentic Margherita Pizza",
+  "description": "Classic Neapolitan-style pizza with fresh mozzarella, San Marzano tomatoes, fresh basil, and extra virgin olive oil.",
+  "instructions": "1. Make the dough: In a large bowl, dissolve yeast in warm water and let stand for 5 minutes until foamy. Add flour, salt, and olive oil. Mix until a shaggy dough forms.\n2. Turn dough onto a floured surface and knead for 8-10 minutes until smooth and elastic. Place in an oiled bowl, cover with a damp towel, and let rise in a warm place for 1-2 hours until doubled in size.\n3. While dough rises, prepare the sauce: In a bowl, crush San Marzano tomatoes by hand. Stir in minced garlic, olive oil, salt, and a pinch of dried oregano. Set aside.\n4. Preheat oven to its highest temperature (500-550°F or 260-290°C). If using a pizza stone, place it in the oven while preheating.\n5. Punch down the risen dough and divide into 2 portions. On a floured surface, stretch each portion into a 12-inch circle, creating a slightly thicker edge for the crust.\n6. Transfer dough to a pizza peel or inverted baking sheet dusted with flour or cornmeal. Spread a thin layer of tomato sauce over the dough, leaving a 1-inch border.\n7. Tear fresh mozzarella into pieces and distribute evenly over the sauce. Drizzle with olive oil and season with salt and pepper.\n8. Slide pizza onto the preheated stone or place baking sheet in oven. Bake for 8-12 minutes until crust is golden and cheese is bubbly.\n9. Remove from oven and immediately top with fresh basil leaves. Drizzle with more olive oil if desired. Let cool for 2 minutes before slicing and serving.",
+  "prep_time": 30,
+  "cook_time": 12,
+  "servings": 4,
+  "difficulty": "medium",
+  "image_url": "",
+  "source_url": "",
+  "tags": "italian,pizza,dinner,vegetarian",
+  "ingredients": [
+    {"name": "all-purpose flour", "quantity": 500, "unit": "g"},
+    {"name": "active dry yeast", "quantity": 7, "unit": "g"},
+    {"name": "water", "quantity": 310, "unit": "ml"},
+    {"name": "salt", "quantity": 10, "unit": "g"},
+    {"name": "olive oil", "quantity": 45, "unit": "ml"},
+    {"name": "san marzano tomato", "quantity": 400, "unit": "g"},
+    {"name": "garlic", "quantity": 2, "unit": "cloves"},
+    {"name": "fresh mozzarella", "quantity": 300, "unit": "g"},
+    {"name": "fresh basil", "quantity": 20, "unit": "g"},
+    {"name": "oregano", "quantity": 2, "unit": "g"},
+    {"name": "black pepper", "quantity": 2, "unit": "g"}
+  ]
+}
+

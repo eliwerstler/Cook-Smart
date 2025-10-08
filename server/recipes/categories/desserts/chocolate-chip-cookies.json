@@ -1,0 +1,24 @@
+{
+  "title": "Perfect Chocolate Chip Cookies",
+  "description": "Soft and chewy chocolate chip cookies with crispy edges, loaded with chocolate chips and a hint of vanilla.",
+  "instructions": "1. Preheat oven to 350°F (175°C). Line two baking sheets with parchment paper.\n2. In a medium bowl, whisk together flour, baking soda, and salt. Set aside.\n3. In a large bowl, beat softened butter, granulated sugar, and brown sugar together until light and fluffy, about 3-4 minutes using an electric mixer.\n4. Add eggs one at a time, beating well after each addition. Mix in vanilla extract.\n5. Gradually add the flour mixture to the butter mixture, mixing on low speed until just combined. Do not overmix.\n6. Fold in chocolate chips using a spatula or wooden spoon, distributing them evenly throughout the dough.\n7. Using a cookie scoop or spoon, drop rounded tablespoons of dough onto prepared baking sheets, spacing them about 2 inches apart.\n8. Bake for 10-12 minutes, or until edges are golden brown but centers still look slightly underdone. They will continue to cook on the baking sheet.\n9. Let cookies cool on the baking sheet for 5 minutes, then transfer to a wire rack to cool completely. Enjoy warm or store in an airtight container for up to 5 days.",
+  "prep_time": 15,
+  "cook_time": 12,
+  "servings": 24,
+  "difficulty": "easy",
+  "image_url": "",
+  "source_url": "",
+  "tags": "dessert,cookies,baking,chocolate,sweet",
+  "ingredients": [
+    {"name": "all-purpose flour", "quantity": 280, "unit": "g"},
+    {"name": "baking soda", "quantity": 5, "unit": "g"},
+    {"name": "salt", "quantity": 5, "unit": "g"},
+    {"name": "butter", "quantity": 225, "unit": "g"},
+    {"name": "granulated sugar", "quantity": 150, "unit": "g"},
+    {"name": "brown sugar", "quantity": 165, "unit": "g"},
+    {"name": "large egg", "quantity": 2, "unit": "pieces"},
+    {"name": "vanilla extract", "quantity": 10, "unit": "ml"},
+    {"name": "chocolate chip", "quantity": 340, "unit": "g"}
+  ]
+}
+

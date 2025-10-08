@@ -1,5 +1,8 @@
 const axios = require('axios');
 const { getDatabase } = require('../database/init');
+const ingredientNormalizer = require('./ingredientNormalizer');
+const unitConverter = require('./unitConverter');
+const recipeValidator = require('./recipeValidator');
 
 class MealDbImporter {
   constructor() {
@@ -110,13 +113,33 @@ class MealDbImporter {
       // Estimate cooking times based on category and ingredients
       const cookingTimes = this.estimateCookingTimes(meal.strCategory, ingredients.length);
 
-      // Insert recipe
+      // Create recipe object for validation
+      const recipeData = {
+        title: meal.strMeal,
+        description: meal.strCategory,
+        instructions: meal.strInstructions,
+        prep_time: cookingTimes.prep,
+        cook_time: cookingTimes.cook,
+        servings: 4,
+        difficulty: this.getDifficulty(meal.strInstructions, ingredients.length),
+        image_url: meal.strMealThumb,
+        source_url: `https://www.themealdb.com/meal/${mealId}`,
+        tags: meal.strTags || meal.strCategory,
+        ingredients: ingredients
+      };
+
+      // Validate recipe
+      const validation = recipeValidator.validateRecipe(recipeData);
+      const qualityScore = validation.score * 100; // Convert 0-1 to 0-100
+
+      // Insert recipe with validation data
       const recipeId = await new Promise((resolve, reject) => {
         this.db.run(`
           INSERT INTO recipes (
             title, description, instructions, prep_time, cook_time, servings,
-            difficulty, image_url, source_url, tags
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            difficulty, image_url, source_url, tags, source_type, quality_score,
+            last_validated, validation_errors
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
           meal.strMeal,
           meal.strCategory,
@@ -127,7 +150,11 @@ class MealDbImporter {
           this.getDifficulty(meal.strInstructions, ingredients.length),
           meal.strMealThumb,
           `https://www.themealdb.com/meal/${mealId}`,
-          meal.strTags || meal.strCategory
+          meal.strTags || meal.strCategory,
+          'themealdb',
+          qualityScore,
+          new Date().toISOString(),
+          validation.isValid ? null : JSON.stringify(validation.errors)
         ], function(err) {
           if (err) reject(err);
           else resolve(this.lastID);
@@ -152,10 +179,11 @@ class MealDbImporter {
       const measure = meal[`strMeasure${i}`];
 
       if (ingredient && ingredient.trim()) {
+        const rawUnit = this.parseUnit(measure);
         ingredients.push({
-          name: ingredient.trim(),
+          name: ingredientNormalizer.getStandardName(ingredient.trim()),
           quantity: this.parseQuantity(measure),
-          unit: this.parseUnit(measure)
+          unit: unitConverter.normalizeUnit(rawUnit)
         });
       }
     }

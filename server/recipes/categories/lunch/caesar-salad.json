@@ -1,0 +1,27 @@
+{
+  "title": "Classic Caesar Salad with Homemade Dressing",
+  "description": "A timeless Caesar salad with crisp romaine lettuce, parmesan cheese, crunchy croutons, and a creamy homemade dressing.",
+  "instructions": "1. Make the croutons: Preheat oven to 375°F (190°C). Cut bread into 1-inch cubes. Toss with olive oil, minced garlic, salt, and pepper. Spread on a baking sheet and bake for 10-12 minutes until golden and crispy. Set aside to cool.\n2. Prepare the Caesar dressing: In a bowl, whisk together mayonnaise, minced garlic, lemon juice, Dijon mustard, Worcestershire sauce, and anchovy paste until smooth. Gradually whisk in olive oil until emulsified. Stir in grated Parmesan cheese. Season with salt and pepper to taste. Refrigerate until ready to use.\n3. Wash and thoroughly dry romaine lettuce. Tear or chop into bite-sized pieces and place in a large salad bowl.\n4. Add about half of the dressing to the lettuce and toss gently to coat every leaf. Add more dressing if needed, but don't overdress.\n5. Add the homemade croutons and toss again.\n6. Divide salad among plates. Top each serving with freshly shaved Parmesan cheese and a crack of black pepper. Serve immediately.",
+  "prep_time": 20,
+  "cook_time": 12,
+  "servings": 4,
+  "difficulty": "medium",
+  "image_url": "",
+  "source_url": "",
+  "tags": "salad,lunch,vegetarian-option,side-dish",
+  "ingredients": [
+    {"name": "romaine lettuce", "quantity": 2, "unit": "heads"},
+    {"name": "parmesan cheese", "quantity": 100, "unit": "g"},
+    {"name": "bread", "quantity": 200, "unit": "g"},
+    {"name": "mayonnaise", "quantity": 120, "unit": "ml"},
+    {"name": "garlic", "quantity": 3, "unit": "cloves"},
+    {"name": "lemon", "quantity": 1, "unit": "pieces"},
+    {"name": "dijon mustard", "quantity": 10, "unit": "ml"},
+    {"name": "worcestershire sauce", "quantity": 5, "unit": "ml"},
+    {"name": "anchovy paste", "quantity": 5, "unit": "g"},
+    {"name": "olive oil", "quantity": 90, "unit": "ml"},
+    {"name": "salt", "quantity": 5, "unit": "g"},
+    {"name": "black pepper", "quantity": 3, "unit": "g"}
+  ]
+}
+

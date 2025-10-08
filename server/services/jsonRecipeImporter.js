@@ -169,12 +169,34 @@ class JsonRecipeImporter {
 
       for (const filePath of files) {
         try {
-          const fileResult = await this.importMultipleFromFile(filePath, {
-            validate,
-            standardize,
-            minQualityScore,
-            overwrite
-          });
+          // Read the JSON file to check if it's an array or single recipe
+          const data = await fs.readFile(filePath, 'utf8');
+          const parsed = JSON.parse(data);
+          
+          let fileResult;
+          if (Array.isArray(parsed)) {
+            // Multiple recipes in one file
+            fileResult = await this.importMultipleFromFile(filePath, {
+              validate,
+              standardize,
+              minQualityScore,
+              overwrite
+            });
+          } else {
+            // Single recipe file
+            const result = await this.importFromFile(filePath, {
+              validate,
+              standardize,
+              minQualityScore,
+              overwrite
+            });
+            fileResult = {
+              total: 1,
+              imported: result.success ? 1 : 0,
+              skipped: result.success ? 0 : 1,
+              errors: result.success ? [] : [result.error]
+            };
+          }
 
           results.files[filePath] = fileResult;
           results.total += fileResult.total || 1;
@@ -245,22 +267,14 @@ class JsonRecipeImporter {
             return reject(new Error('Recipe already exists (use overwrite=true to replace)'));
           }
 
-          // Delete existing recipe if overwriting
-          if (existing && overwrite) {
-            this.db.run('DELETE FROM recipes WHERE id = ?', [existing.id], (err) => {
-              if (err) return reject(err);
-              insertNewRecipe();
-            });
-          } else {
-            insertNewRecipe();
-          }
-
-          function insertNewRecipe() {
+          // Arrow function to preserve 'this' context
+          const insertNewRecipe = () => {
             // Validate recipe before saving
             const validation = recipeValidator.validateRecipe(recipe);
+            const db = this.db; // Capture db reference for callback
             
             // Insert recipe
-            this.db.run(`
+            db.run(`
               INSERT INTO recipes (
                 title, description, instructions, prep_time, cook_time, servings,
                 difficulty, image_url, source_url, source_type, quality_score,
@@ -277,7 +291,7 @@ class JsonRecipeImporter {
               recipe.image_url || null,
               recipe.source_url || null,
               recipe.source_type || 'json',
-              validation.score,
+              validation.score * 100, // Convert 0-1 to 0-100
               recipe.last_validated || new Date().toISOString(),
               validation.errors.length > 0 ? JSON.stringify(validation.errors) : null,
               recipe.tags || null,
@@ -289,7 +303,7 @@ class JsonRecipeImporter {
 
               // Insert ingredients
               if (recipe.ingredients && recipe.ingredients.length > 0) {
-                const ingredientStmt = this.db.prepare(`
+                const ingredientStmt = db.prepare(`
                   INSERT INTO recipe_ingredients (recipe_id, ingredient_name, quantity, unit, optional)
                   VALUES (?, ?, ?, ?, ?)
                 `);
@@ -309,6 +323,16 @@ class JsonRecipeImporter {
 
               resolve(recipeId);
             });
+          };
+
+          // Delete existing recipe if overwriting
+          if (existing && overwrite) {
+            this.db.run('DELETE FROM recipes WHERE id = ?', [existing.id], (err) => {
+              if (err) return reject(err);
+              insertNewRecipe();
+            });
+          } else {
+            insertNewRecipe();
           }
         }
       );

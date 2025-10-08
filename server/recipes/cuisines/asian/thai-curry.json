@@ -1,0 +1,29 @@
+{
+  "title": "Thai Red Curry with Chicken and Vegetables",
+  "description": "Aromatic and creamy Thai red curry with tender chicken, colorful vegetables, and fragrant Thai basil in coconut milk.",
+  "instructions": "1. Heat vegetable oil in a large wok or deep skillet over medium-high heat. Add red curry paste and stir-fry for 1-2 minutes until fragrant.\n2. Add the thicker part of the coconut milk (the cream that rises to the top) and stir continuously for 2-3 minutes until the oil begins to separate from the curry paste.\n3. Add diced chicken and stir-fry for 3-4 minutes until the chicken is mostly cooked through and coated in the curry.\n4. Pour in the remaining coconut milk and chicken stock. Stir in fish sauce, palm sugar (or brown sugar), and lime leaves. Bring to a gentle simmer.\n5. Add bell peppers, bamboo shoots, and Thai eggplant. Simmer for 8-10 minutes until vegetables are tender and chicken is fully cooked.\n6. Stir in Thai basil leaves and cook for another minute until wilted. Taste and adjust seasoning with more fish sauce or sugar if needed.\n7. Remove from heat. Squeeze fresh lime juice over the curry just before serving.\n8. Serve hot over steamed jasmine rice, garnished with additional Thai basil and sliced red chili if desired.",
+  "prep_time": 15,
+  "cook_time": 25,
+  "servings": 4,
+  "difficulty": "medium",
+  "image_url": "",
+  "source_url": "",
+  "tags": "thai,asian,curry,chicken,spicy,dinner",
+  "ingredients": [
+    {"name": "chicken breast", "quantity": 500, "unit": "g"},
+    {"name": "red curry paste", "quantity": 60, "unit": "g"},
+    {"name": "coconut milk", "quantity": 400, "unit": "ml"},
+    {"name": "chicken stock", "quantity": 200, "unit": "ml"},
+    {"name": "fish sauce", "quantity": 30, "unit": "ml"},
+    {"name": "palm sugar", "quantity": 15, "unit": "g"},
+    {"name": "bell pepper", "quantity": 2, "unit": "pieces"},
+    {"name": "bamboo shoots", "quantity": 150, "unit": "g"},
+    {"name": "thai eggplant", "quantity": 150, "unit": "g"},
+    {"name": "thai basil", "quantity": 30, "unit": "g"},
+    {"name": "lime leaves", "quantity": 4, "unit": "pieces"},
+    {"name": "lime", "quantity": 1, "unit": "pieces"},
+    {"name": "vegetable oil", "quantity": 30, "unit": "ml"},
+    {"name": "red chili", "quantity": 1, "unit": "pieces"}
+  ]
+}
+

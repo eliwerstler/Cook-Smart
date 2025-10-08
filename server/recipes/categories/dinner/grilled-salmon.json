@@ -1,0 +1,24 @@
+{
+  "title": "Herb-Crusted Grilled Salmon",
+  "description": "Perfectly grilled salmon fillets with a flavorful herb crust, lemon, and garlic. Healthy and delicious.",
+  "instructions": "1. Remove salmon from refrigerator 15 minutes before cooking to bring to room temperature. Pat dry with paper towels.\n2. In a small bowl, mix together minced garlic, chopped fresh dill, parsley, thyme, lemon zest, olive oil, salt, and pepper to create an herb paste.\n3. Rub the herb mixture generously over the top and sides of each salmon fillet.\n4. Preheat grill to medium-high heat (about 400°F/200°C). Clean and oil the grill grates to prevent sticking.\n5. Place salmon fillets skin-side down on the grill. Close the lid and cook for 6-8 minutes without moving them. The skin should be crispy.\n6. Carefully flip the salmon using a wide spatula. Cook for another 3-4 minutes until the internal temperature reaches 145°F (63°C) and the fish flakes easily with a fork.\n7. Remove from grill and let rest for 2 minutes. The salmon will continue to cook slightly.\n8. Serve immediately with lemon wedges, your choice of roasted vegetables, or a fresh salad. Drizzle with any remaining herb oil if desired.",
+  "prep_time": 10,
+  "cook_time": 12,
+  "servings": 4,
+  "difficulty": "easy",
+  "image_url": "",
+  "source_url": "",
+  "tags": "seafood,salmon,dinner,healthy,grilled,low-carb,gluten-free",
+  "ingredients": [
+    {"name": "salmon fillet", "quantity": 4, "unit": "pieces"},
+    {"name": "garlic", "quantity": 3, "unit": "cloves"},
+    {"name": "fresh dill", "quantity": 15, "unit": "g"},
+    {"name": "fresh parsley", "quantity": 15, "unit": "g"},
+    {"name": "fresh thyme", "quantity": 5, "unit": "g"},
+    {"name": "lemon", "quantity": 2, "unit": "pieces"},
+    {"name": "olive oil", "quantity": 45, "unit": "ml"},
+    {"name": "salt", "quantity": 5, "unit": "g"},
+    {"name": "black pepper", "quantity": 3, "unit": "g"}
+  ]
+}
+

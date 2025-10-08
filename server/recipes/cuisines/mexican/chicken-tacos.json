@@ -1,0 +1,32 @@
+{
+  "title": "Authentic Chicken Tacos with Cilantro Lime Slaw",
+  "description": "Flavorful Mexican-style chicken tacos with perfectly seasoned meat, fresh slaw, and traditional toppings.",
+  "instructions": "1. In a bowl, combine chili powder, cumin, paprika, garlic powder, onion powder, oregano, salt, and pepper. Rub this spice mixture all over the chicken breasts.\n2. Heat olive oil in a large skillet over medium-high heat. Add the seasoned chicken and cook for 6-7 minutes per side until fully cooked (internal temperature 165°F/74°C). Remove from heat and let rest for 5 minutes, then dice into small pieces.\n3. While chicken cooks, prepare the cilantro lime slaw: In a large bowl, combine shredded cabbage, chopped cilantro, lime juice, a drizzle of olive oil, and a pinch of salt. Toss well and refrigerate.\n4. Warm the corn tortillas in a dry skillet or directly over a gas flame for 30 seconds per side until slightly charred and pliable.\n5. Assemble tacos: Place diced chicken on each tortilla, top with cilantro lime slaw, diced tomatoes, avocado slices, crumbled queso fresco, and a squeeze of fresh lime juice.\n6. Serve immediately with hot sauce on the side if desired.",
+  "prep_time": 15,
+  "cook_time": 20,
+  "servings": 6,
+  "difficulty": "easy",
+  "image_url": "",
+  "source_url": "",
+  "tags": "mexican,tacos,chicken,dinner,gluten-free",
+  "ingredients": [
+    {"name": "chicken breast", "quantity": 600, "unit": "g"},
+    {"name": "chili powder", "quantity": 5, "unit": "g"},
+    {"name": "cumin", "quantity": 3, "unit": "g"},
+    {"name": "paprika", "quantity": 3, "unit": "g"},
+    {"name": "garlic powder", "quantity": 2, "unit": "g"},
+    {"name": "onion powder", "quantity": 2, "unit": "g"},
+    {"name": "oregano", "quantity": 2, "unit": "g"},
+    {"name": "olive oil", "quantity": 30, "unit": "ml"},
+    {"name": "cabbage", "quantity": 200, "unit": "g"},
+    {"name": "cilantro", "quantity": 20, "unit": "g"},
+    {"name": "lime", "quantity": 3, "unit": "pieces"},
+    {"name": "corn tortilla", "quantity": 12, "unit": "pieces"},
+    {"name": "tomato", "quantity": 2, "unit": "pieces"},
+    {"name": "avocado", "quantity": 2, "unit": "pieces"},
+    {"name": "queso fresco", "quantity": 100, "unit": "g"},
+    {"name": "salt", "quantity": 5, "unit": "g"},
+    {"name": "black pepper", "quantity": 2, "unit": "g"}
+  ]
+}
+

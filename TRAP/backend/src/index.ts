@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import authRoutes from './routes/authRoutes';
 
 dotenv.config();
 
@@ -26,6 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'TRAP API is running' });
 });
+
+// API Routes
+app.use('/api/auth', authRoutes);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {

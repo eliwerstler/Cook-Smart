@@ -175,15 +175,34 @@ export const sessionService = {
   /**
    * Get user's sessions
    */
-  async getUserSessions(userId: string, limit: number = 20) {
+  async getUserSessions(userId: string, limit: number = 20, offset: number = 0) {
     return await prisma.session.findMany({
       where: { userId },
       orderBy: { startTime: 'desc' },
       take: limit,
+      skip: offset,
       include: {
         drinks: {
           orderBy: { timestamp: 'desc' },
           take: 1, // Get cover photo
+        },
+      },
+    });
+  },
+
+  /**
+   * Get a specific session by ID
+   */
+  async getSessionById(sessionId: string) {
+    return await prisma.session.findUnique({
+      where: { id: sessionId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
         },
       },
     });

@@ -11,17 +11,20 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
+import DrinkTypeSelector from './DrinkTypeSelector';
+import { drinkService } from '../services/drinkService';
 
 interface CameraModalProps {
   visible: boolean;
   onClose: () => void;
-  onPhotoTaken: (photoUri: string) => void;
+  onDrinkPosted: () => void;
 }
 
-export default function CameraModal({ visible, onClose, onPhotoTaken }: CameraModalProps) {
+export default function CameraModal({ visible, onClose, onDrinkPosted }: CameraModalProps) {
   const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [facing, setFacing] = useState<'front' | 'back'>('back');
+  const [posting, setPosting] = useState(false);
   const cameraRef = useRef<CameraView>(null);
 
   const handleTakePhoto = async () => {
@@ -42,15 +45,44 @@ export default function CameraModal({ visible, onClose, onPhotoTaken }: CameraMo
     setPhotoUri(null);
   };
 
-  const handleUsePhoto = () => {
-    if (photoUri) {
-      onPhotoTaken(photoUri);
+  const handleDrinkSelected = async (
+    drinkType: string,
+    alcoholContent: number,
+    caption: string
+  ) => {
+    try {
+      setPosting(true);
+
+      // TODO: Upload photo to Cloudinary and get URL
+      // For now, we'll just use a placeholder or local URI
+      const photoUrl = photoUri || undefined;
+
+      // Create the drink
+      await drinkService.createDrink({
+        drinkType,
+        alcoholContent,
+        caption: caption || undefined,
+        photoUrl,
+      });
+
+      Alert.alert('Success', 'Drink posted! 🍺');
+
+      // Reset state
       setPhotoUri(null);
+      setPosting(false);
+
+      // Notify parent
+      onDrinkPosted();
+    } catch (error: any) {
+      console.error('Error posting drink:', error);
+      Alert.alert('Error', error.message || 'Failed to post drink');
+      setPosting(false);
     }
   };
 
   const handleClose = () => {
     setPhotoUri(null);
+    setPosting(false);
     onClose();
   };
 
@@ -85,39 +117,37 @@ export default function CameraModal({ visible, onClose, onPhotoTaken }: CameraMo
   return (
     <Modal visible={visible} animationType="slide">
       <View style={styles.container}>
-        {photoUri ? (
-          // Photo Preview
-          <View style={styles.previewContainer}>
-            <Image source={{ uri: photoUri }} style={styles.preview} />
-            <View style={styles.previewControls}>
-              <TouchableOpacity style={styles.retakeButton} onPress={handleRetake}>
-                <Text style={styles.retakeButtonText}>Retake</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.usePhotoButton} onPress={handleUsePhoto}>
-                <Text style={styles.usePhotoButtonText}>Use Photo</Text>
-              </TouchableOpacity>
-            </View>
+        {posting ? (
+          // Posting state
+          <View style={styles.postingContainer}>
+            <ActivityIndicator size="large" color="#0095f6" />
+            <Text style={styles.postingText}>Posting your drink...</Text>
           </View>
+        ) : photoUri ? (
+          // Drink type selector with photo preview
+          <DrinkTypeSelector
+            photoUri={photoUri}
+            onSubmit={handleDrinkSelected}
+            onCancel={handleRetake}
+          />
         ) : (
           // Camera View
-          <>
-            <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
-              <View style={styles.cameraHeader}>
-                <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-                  <Ionicons name="close" size={32} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.flipButton} onPress={toggleCameraFacing}>
-                  <Ionicons name="camera-reverse" size={32} color="#fff" />
-                </TouchableOpacity>
-              </View>
+          <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
+            <View style={styles.cameraHeader}>
+              <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+                <Ionicons name="close" size={32} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.flipButton} onPress={toggleCameraFacing}>
+                <Ionicons name="camera-reverse" size={32} color="#fff" />
+              </TouchableOpacity>
+            </View>
 
-              <View style={styles.cameraFooter}>
-                <TouchableOpacity style={styles.captureButton} onPress={handleTakePhoto}>
-                  <View style={styles.captureButtonInner} />
-                </TouchableOpacity>
-              </View>
-            </CameraView>
-          </>
+            <View style={styles.cameraFooter}>
+              <TouchableOpacity style={styles.captureButton} onPress={handleTakePhoto}>
+                <View style={styles.captureButtonInner} />
+              </TouchableOpacity>
+            </View>
+          </CameraView>
         )}
       </View>
     </Modal>
@@ -210,43 +240,15 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     backgroundColor: '#fff',
   },
-  previewContainer: {
+  postingContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
-  preview: {
-    flex: 1,
-  },
-  previewControls: {
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 40,
-  },
-  retakeButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: '#fff',
-  },
-  retakeButtonText: {
-    color: '#fff',
+  postingText: {
+    marginTop: 20,
     fontSize: 16,
-    fontWeight: '600',
-  },
-  usePhotoButton: {
-    backgroundColor: '#0095f6',
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 25,
-  },
-  usePhotoButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#666',
   },
 });

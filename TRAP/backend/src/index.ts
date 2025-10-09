@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import authRoutes from './routes/authRoutes';
+import drinkRoutes from './routes/drinkRoutes';
+import sessionRoutes from './routes/sessionRoutes';
 
 dotenv.config();
 
@@ -30,6 +32,8 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/drinks', drinkRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {

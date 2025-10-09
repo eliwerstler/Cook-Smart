@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 // Screens (we'll create these)
@@ -45,16 +45,20 @@ export default function MainTabNavigator() {
       <Tab.Screen
         name="Camera"
         component={HomeScreen} // Placeholder - will handle camera separately
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            console.log('Camera pressed!');
+            // TODO: Open camera modal
+          },
+        }}
         options={{
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              {...props}
-              style={styles.cameraButton}
-              onPress={() => {
-                // TODO: Open camera modal
-                console.log('Camera pressed!');
-              }}
-            />
+          tabBarIcon: ({ color }) => (
+            <View style={styles.cameraButtonContainer}>
+              <View style={styles.cameraButton}>
+                <Ionicons name="add" size={32} color="#fff" />
+              </View>
+            </View>
           ),
         }}
       />
@@ -73,7 +77,25 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     paddingTop: 8,
   },
+  cameraButtonContainer: {
+    top: -20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   cameraButton: {
-    top: -8,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#0095f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

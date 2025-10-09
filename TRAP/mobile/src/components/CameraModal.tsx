@@ -13,6 +13,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import DrinkTypeSelector from './DrinkTypeSelector';
 import { drinkService } from '../services/drinkService';
+import { uploadImage } from '../services/uploadService';
 
 interface CameraModalProps {
   visible: boolean;
@@ -53,16 +54,42 @@ export default function CameraModal({ visible, onClose, onDrinkPosted }: CameraM
     try {
       setPosting(true);
 
-      // TODO: Upload photo to Cloudinary and get URL
-      // For now, we'll just use a placeholder or local URI
-      const photoUrl = photoUri || undefined;
+      let uploadedPhotoUrl: string | undefined;
+
+      // Upload photo to Cloudinary if we have one
+      if (photoUri) {
+        try {
+          console.log('Uploading photo to Cloudinary...');
+          uploadedPhotoUrl = await uploadImage(photoUri, 'drinks');
+          console.log('Photo uploaded successfully:', uploadedPhotoUrl);
+        } catch (uploadError: any) {
+          console.error('Photo upload failed:', uploadError);
+
+          // Ask user if they want to continue without photo
+          const shouldContinue = await new Promise<boolean>((resolve) => {
+            Alert.alert(
+              'Upload Failed',
+              'Photo upload failed. Post without a photo?',
+              [
+                { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+                { text: 'Post Anyway', onPress: () => resolve(true) },
+              ]
+            );
+          });
+
+          if (!shouldContinue) {
+            setPosting(false);
+            return;
+          }
+        }
+      }
 
       // Create the drink
       await drinkService.createDrink({
         drinkType,
         alcoholContent,
         caption: caption || undefined,
-        photoUrl,
+        photoUrl: uploadedPhotoUrl,
       });
 
       Alert.alert('Success', 'Drink posted! 🍺');

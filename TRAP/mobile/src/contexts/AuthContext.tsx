@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, RegisterRequest, LoginRequest } from '../../../shared/types';
 import { authService } from '../services/authService';
+import { DEV_AUTO_LOGIN } from '../utils/config';
 
 interface AuthContextType {
   user: User | null;
@@ -28,6 +29,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (isAuth) {
         const currentUser = await authService.getCurrentUser();
         setUser(currentUser);
+      } else if (DEV_AUTO_LOGIN && DEV_AUTO_LOGIN.enabled) {
+        // Auto-login for development (TESTING ONLY)
+        console.log('🔧 Dev auto-login enabled - logging in automatically...');
+        try {
+          const response = await authService.login({
+            email: DEV_AUTO_LOGIN.email,
+            password: DEV_AUTO_LOGIN.password,
+          });
+          setUser(response.user);
+          console.log('✅ Auto-login successful');
+        } catch (error) {
+          console.log('❌ Auto-login failed - showing login screen');
+        }
       }
     } catch (error) {
       console.error('Auth check failed:', error);

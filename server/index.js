@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -5,12 +6,17 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
+const isProduction = process.env.NODE_ENV === 'production';
+// Comma-separated list of allowed browser origins (only needed when the client is hosted separately)
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map((o) => o.trim());
 
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:3000'],
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -42,6 +48,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Cook Smart API is running' });
 });
 
+// In production, serve the built React client from the same server
+if (isProduction) {
+  const clientBuild = path.join(__dirname, '..', 'client', 'build');
+  app.use(express.static(clientBuild));
+  app.get(/^\/(?!api\/).*/, (req, res) => {
+    res.sendFile(path.join(clientBuild, 'index.html'));
+  });
+}
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -59,10 +74,24 @@ app.use('*', (req, res) => {
 // Initialize database and start server
 const { initializeDatabase } = require('./database/init');
 
+// Load the bundled sample recipes on first run so a fresh deploy isn't empty
+async function seedRecipesIfEmpty() {
+  const { getDatabase } = require('./database/init');
+  const db = getDatabase();
+  const row = await new Promise((resolve, reject) => {
+    db.get('SELECT COUNT(*) AS count FROM recipes', (err, r) => (err ? reject(err) : resolve(r)));
+  });
+  if (row.count > 0) return;
+  const JsonRecipeImporter = require('./services/jsonRecipeImporter');
+  const results = await new JsonRecipeImporter().importFromDirectory(path.join(__dirname, 'recipes'));
+  console.log(`Seeded ${results.imported} sample recipes`);
+}
+
 async function startServer() {
   try {
     await initializeDatabase();
     console.log('Database initialized successfully');
+    await seedRecipesIfEmpty();
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
